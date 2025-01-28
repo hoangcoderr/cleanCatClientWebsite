@@ -1,0 +1,123 @@
+body {
+    background-image: url('../img/web-background.webp');
+    background-size: cover;
+    background-position: center;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+}
+
+.mid-logo {
+    width: 300px;
+    height: auto;
+}
+
+.header-container {
+    background-color: rgba(34, 32, 37, 0.466);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-container {
+    background-color: rgba(248, 249, 250, 0.09);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-top: 0;
+    color: white;
+}
+
+.content-container h3 {
+    color: rgba(255, 255, 255, 0.814);
+    letter-spacing: -2px;
+    font-weight: 1;
+}
+
+.btn-custom {
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 10px 30px;
+    margin: 0 20px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-custom svg {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.header-icons img {
+    width: 30px;
+    height: 30px;
+    margin-left: 10px;
+}
+
+.header-icons a {
+    margin-left: 15px;
+}
+.loginButton {
+    background-color: #007bff9b; /* Màu nền cho nút đăng nhập */
+    color: white; /* Màu chữ cho nút đăng nhập */
+    border: none; /* Bỏ viền */
+    border-radius: 20px; /* Bo tròn góc */
+    padding: 10px 30px; /* Khoảng cách bên trong */
+    margin: 0 10px; /* Khoảng cách bên ngoài */
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.registerButton {
+    background-color: #6c757d9f; /* Màu nền cho nút đăng ký */
+    color: white; /* Màu chữ cho nút đăng ký */
+    border: none; /* Bỏ viền */
+    border-radius: 20px; /* Bo tròn góc */
+    padding: 10px 30px; /* Khoảng cách bên trong */
+    margin: 0 10px; /* Khoảng cách bên ngoài */
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.overlay-content {
+    background-color: rgba(255, 255, 255, 0.322);
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    transform: scale(0.7);
+    transition: transform 0.3s ease;
+}
+
+.overlay.show .overlay-content {
+    transform: scale(1);
+}
