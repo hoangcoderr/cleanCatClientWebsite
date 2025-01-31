@@ -2,17 +2,18 @@
 <html>
 
 <head>
-    <title>cleanCat Client</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="img/logo.png" type="image/x-icon">
+    <title>Login - cleanCat Client</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/login-styles.css">
+    <link rel="icon" href="../img/logo.png" type="image/x-icon">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
     <div class="container-fluid header-container">
         <div class="d-flex align-items-center">
             <a href="http://cleancat.games" class="d-flex align-items-center" style="text-decoration: none;">
-                <img src="img/logo.png" class="img-fluid me-3 logo" alt="Responsive image">
+                <img src="../img/logo.png" class="img-fluid me-3 logo" alt="Responsive image">
                 <h1 style="color: gray;">cleanCat Client</h1>
             </a>
         </div>
@@ -31,19 +32,31 @@
                         d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.794.715-1.794 1.763v2.311h3.587l-.467 3.622h-3.12V24h6.116c.729 0 1.325-.597 1.325-1.324V1.325C24 .597 23.403 0 22.675 0z" />
                 </svg>
             </a>
+            <a href="login.html" class="btn loginButton btn-primary ms-3">Login</a>
+            <a href="register.html" class="btn registerButton btn-secondary ms-0">Register</a>
         </div>
     </div>
 
-    <div class="container-fluid content-container">
-        <div style="display: flex; align-items: center; justify-content: center;">
-            <img src="img/logo.png" class="img-fluid" style="width: 50px; height: 50px;" alt="Responsive image">
-            <h1 style="font-size: 50px; color: rgb(111, 148, 148); margin: 0 10px;">404 NOT FOUND</h1>
-            <img src="img/logo.png" class="img-fluid" style="width: 50px; height: 50px;" alt="Responsive image">
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="https://cleancat.games" style="font-size: 20px; color: rgb(113, 137, 137);">Click here to go back to main page</a>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 shadow-lg card-custom">
+            <h2 class="text-center mb-4 lbLogin">Login</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="email" class="form-label lbAtr">Account</label>
+                    <input type="email" class="form-control" id="email" placeholder="Accountl">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label lbAtr">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-login">Login</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="register.html">Don't have an account? Register</a>
+            </div>
         </div>
     </div>
+   
 </body>
 
 </html>
