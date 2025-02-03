@@ -1,14 +1,14 @@
 .card-custom {
     width: 400px;
-    background-color: rgba(78, 73, 86, 0.245);    
+    background-color: rgba(220, 219, 222, 0.217);    
 }
 
 .lbLogin{
-    color: rgba(144, 130, 130, 0.692);
+    color: rgba(42, 38, 38, 0.789);
 }
 
 .lbAtr {
-    color: #5e5a59;
+    color: #2b2827;
     font-weight: bold;
 }
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register - cleanCat Client</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/login-styles.css">
+    <link rel="icon" href="../img/logo.png" type="image/x-icon">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <div class="container-fluid header-container">
+        <div class="d-flex align-items-center">
+            <a href="http://cleancat.games" class="d-flex align-items-center" style="text-decoration: none;">
+                <img src="../img/logo.png" class="img-fluid me-3 logo" alt="Responsive image">
+                <h1 style="color: gray;">cleanCat Client</h1>
+            </a>
+        </div>
+        <div class="header-icons d-flex align-items-center">
+            <a href="https://discord.com" target="_blank">
+                <svg class="Icon Icon-discordLogo Svg sc-bdVaJa ceqYyk" viewBox="0 0 13 11" role="img" width="30"
+                    height="30">
+                    <path
+                        d="M10.6187 1.68123C9.84994 1.32498 9.03119 1.06248 8.16869 0.912481C8.06244 1.09998 7.93744 1.35623 7.85619 1.56248C6.9437 1.42498 6.03744 1.42498 5.1437 1.56248C5.0562 1.35623 4.9312 1.09998 4.82495 0.912481C3.96245 1.06248 3.1437 1.32498 2.37495 1.68123C0.824951 4.01873 0.406201 6.3 0.612451 8.54375C1.6437 9.3125 2.63745 9.775 3.6187 10.0813C3.86245 9.75 4.07495 9.39375 4.26245 9.025C3.9062 8.89375 3.5687 8.725 3.24995 8.53125C3.33745 8.46875 3.4187 8.4 3.49995 8.3375C5.45619 9.25 7.57494 9.25 9.50619 8.3375C9.58744 8.40625 9.66869 8.46875 9.75619 8.53125C9.43744 8.725 9.09369 8.8875 8.7437 9.025C8.9312 9.39375 9.14369 9.75 9.38745 10.0813C10.3687 9.775 11.3687 9.3125 12.3937 8.54375C12.6374 5.9375 11.9749 3.68123 10.6312 1.68123H10.6187ZM4.52495 7.16875C3.93745 7.16875 3.4562 6.625 3.4562 5.95625C3.4562 5.2875 3.92495 4.74375 4.52495 4.74375C5.12495 4.74375 5.59995 5.2875 5.59369 5.95625C5.59369 6.61875 5.12495 7.16875 4.52495 7.16875ZM8.46869 7.16875C7.88119 7.16875 7.39994 6.625 7.39994 5.95625C7.39994 5.2875 7.86869 4.74375 8.46869 4.74375C9.06869 4.74375 9.5437 5.2875 9.53745 5.95625C9.53745 6.61875 9.06869 7.16875 8.46869 7.16875Z"
+                        fill="white"></path>
+                </svg>
+            </a>
+            <a href="https://www.facebook.com/hoangkev1n/" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="white">
+                    <path
+                        d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.794.715-1.794 1.763v2.311h3.587l-.467 3.622h-3.12V24h6.116c.729 0 1.325-.597 1.325-1.324V1.325C24 .597 23.403 0 22.675 0z" />
+                </svg>
+            </a>
+            <a href="login.html" class="btn loginButton btn-primary ms-3">Login</a>
+            <a href="register.html" class="btn registerButton btn-secondary ms-0">Register</a>
+        </div>
+    </div>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 shadow-lg card-custom">
+            <h2 class="text-center mb-4 lbLogin">Register</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="account" class="form-label lbAtr">Account</label>
+                    <input type="text" class="form-control" id="account" placeholder="Account">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label lbAtr">Email</label>
+                    <input type="text" class="form-control" id="account" placeholder="Email">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label lbAtr">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label lbAtr">Confirm Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Confirm Password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-login">Register</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="login.html">Already have an account? Login!</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
