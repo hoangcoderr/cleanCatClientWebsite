@@ -7,6 +7,13 @@ import Showcase from './components/Showcase';
 import Testimonials from './components/Testimonials';
 import CTA from './components/CTA';
 import LatestUpdates from './components/LatestUpdates';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import Store from './components/store/Store';
+import Admin from './components/admin/Admin';
+import Download from './components/Download';
+import Donate from './components/Donate';
+import Profile from './components/Profile';
 
 const Home = () => {
   return (
@@ -27,7 +34,13 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Add other routes here */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/download" element={<Download />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Layout>
     </Router>
