@@ -1,0 +1,328 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .updates-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .timeline {
+        position: relative;
+        margin: 40px 0;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 5px;
+        background-color: var(--dirt-brown);
+    }
+    
+    .update-card {
+        position: relative;
+        margin-bottom: 40px;
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        border-left: 5px solid var(--diamond-blue);
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .update-card:hover {
+        transform: translateX(5px);
+        box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .update-card::before {
+        content: '';
+        position: absolute;
+        left: -38px;
+        top: 15px;
+        width: 15px;
+        height: 15px;
+        border-radius: 0;
+        background-color: var(--diamond-blue);
+        border: 3px solid var(--obsidian-black);
+        z-index: 1;
+    }
+    
+    .update-version-badge {
+        display: inline-block;
+        background-color: var(--diamond-blue);
+        color: var(--obsidian-black);
+        font-family: var(--pixel-font);
+        font-size: 1.1rem;
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+    
+    .update-date {
+        color: #aaa;
+        font-size: 0.9rem;
+    }
+    
+    .feature-list {
+        margin-top: 15px;
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .feature-item {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+        position: relative;
+        padding-left: 25px;
+    }
+    
+    .feature-item:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-item::before {
+        content: '✦';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        color: var(--gold);
+    }
+    
+    .feature-type {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        margin-left: 10px;
+        display: inline-block;
+    }
+    
+    .feature-new {
+        background-color: var(--grass-green);
+        color: white;
+    }
+    
+    .feature-improvement {
+        background-color: var(--gold);
+        color: black;
+    }
+    
+    .feature-fix {
+        background-color: var(--redstone-red);
+        color: white;
+    }
+    
+    .search-updates {
+        margin-bottom: 30px;
+    }
+    
+    .version-filter-btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 2px solid var(--dirt-brown);
+        color: white;
+        transition: all 0.3s;
+    }
+    
+    .version-filter-btn:hover, .version-filter-btn.active {
+        background-color: var(--dirt-brown);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter updates by version
+        const versionButtons = document.querySelectorAll('.version-filter-btn');
+        versionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                versionButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const version = this.dataset.version;
+                const updateCards = document.querySelectorAll('.update-card');
+                
+                updateCards.forEach(card => {
+                    if (version === 'all' || card.dataset.version === version) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Search updates
+        const searchInput = document.getElementById('search-updates');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const updateCards = document.querySelectorAll('.update-card');
+                
+                updateCards.forEach(card => {
+                    const content = card.textContent.toLowerCase();
+                    if (content.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="minecraft-title diamond text-center mb-4">CleanCatClient Updates</h1>
+    <p class="text-center mb-5">Stay informed about the latest features, improvements, and bug fixes for CleanCatClient.</p>
+    
+    <div class="updates-container">
+        <!-- Search and Filter -->
+        <div class="minecraft-panel search-updates">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <input type="text" id="search-updates" class="minecraft-input form-control" placeholder="Search updates...">
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-wrap justify-content-md-end">
+                        <button class="version-filter-btn active" data-version="all">All</button>
+                        <button class="version-filter-btn" data-version="1.1">v1.1.x</button>
+                        <button class="version-filter-btn" data-version="1.0">v1.0.x</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Updates Timeline -->
+        <div class="timeline">
+            <div class="update-card fade-in-element" data-version="1.1">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="update-version-badge">v1.1.0</span>
+                    <span class="update-date">Released March 10, 2023</span>
+                </div>
+                <h3>Major Feature Update</h3>
+                <p>This update introduces several new features and improvements to enhance your gameplay experience.</p>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">Added new cosmetic options including animated capes and custom particles <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Improved rendering performance by optimizing shader loading <span class="feature-type feature-improvement">IMPROVEMENT</span></li>
+                    <li class="feature-item">Enhanced mod compatibility with popular Minecraft mods <span class="feature-type feature-improvement">IMPROVEMENT</span></li>
+                    <li class="feature-item">Added customizable hotkeys for all client features <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Implemented new HUD customization options <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Fixed crash when using certain resource packs <span class="feature-type feature-fix">FIX</span></li>
+                </ul>
+                
+                <div class="mt-4">
+                    <a href="#" class="minecraft-btn primary">Download v1.1.0</a>
+                </div>
+            </div>
+            
+            <div class="update-card fade-in-element" data-version="1.0">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="update-version-badge">v1.0.1</span>
+                    <span class="update-date">Released February 1, 2023</span>
+                </div>
+                <h3>Bug Fixes & Improvements</h3>
+                <p>This maintenance update addresses several bugs and improves stability.</p>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">Fixed memory leak when playing for extended periods <span class="feature-type feature-fix">FIX</span></li>
+                    <li class="feature-item">Improved chunk loading performance <span class="feature-type feature-improvement">IMPROVEMENT</span></li>
+                    <li class="feature-item">Fixed compatibility issues with Minecraft 1.19.3 <span class="feature-type feature-fix">FIX</span></li>
+                    <li class="feature-item">Reduced CPU usage during idle moments <span class="feature-type feature-improvement">IMPROVEMENT</span></li>
+                    <li class="feature-item">Fixed several UI glitches in the settings menu <span class="feature-type feature-fix">FIX</span></li>
+                </ul>
+                
+                <div class="mt-4">
+                    <a href="#" class="minecraft-btn primary">Download v1.0.1</a>
+                </div>
+            </div>
+            
+            <div class="update-card fade-in-element" data-version="1.0">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="update-version-badge">v1.0.0</span>
+                    <span class="update-date">Released January 15, 2023</span>
+                </div>
+                <h3>Initial Release</h3>
+                <p>The first public release of CleanCatClient with core features and optimizations.</p>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">Core performance optimizations for better FPS <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Basic HUD customization options <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Custom keybinding system <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Screenshot manager with auto-upload capability <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Basic cosmetic features (capes, hats) <span class="feature-type feature-new">NEW</span></li>
+                    <li class="feature-item">Settings system with profiles <span class="feature-type feature-new">NEW</span></li>
+                </ul>
+                
+                <div class="mt-4">
+                    <a href="#" class="minecraft-btn primary">Download v1.0.0</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Roadmap -->
+        <div class="minecraft-panel mt-5">
+            <h3 class="minecraft-title emerald mb-4">Development Roadmap</h3>
+            <p>Here's a sneak peek at what we're working on for future updates:</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Coming in v1.2.0
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Advanced shader support</li>
+                                <li>Custom player models</li>
+                                <li>Enhanced minimap system</li>
+                                <li>Voice chat integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Planned for v1.3.0
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Replay system</li>
+                                <li>Advanced macros</li>
+                                <li>Custom animations</li>
+                                <li>Server-side integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Future Ideas
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Mobile companion app</li>
+                                <li>Custom mod integration API</li>
+                                <li>AI-assisted gameplay features</li>
+                                <li>Community marketplace</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

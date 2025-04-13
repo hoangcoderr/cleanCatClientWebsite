@@ -1,0 +1,429 @@
+/* Main styles for CleanCatClient website */
+
+/* Global Styles */
+:root {
+    /* Minecraft inspired colors */
+    --dirt-brown: #8B5A2B;
+    --grass-green: #5D8544;
+    --stone-gray: #828282;
+    --wood-light: #A0522D;
+    --wood-dark: #654321;
+    --sky-blue: #87CEEB;
+    --water-blue: #4682B4;
+    --gold: #FFD700;
+    --diamond-blue: #B9F2FF;
+    --redstone-red: #FF3333;
+    --obsidian-black: #211A1D;
+    
+    /* Font families */
+    --pixel-font: 'VT323', monospace;
+    --main-font: 'Press Start 2P', cursive;
+    --body-font: 'Roboto', sans-serif;
+}
+
+body {
+    font-family: var(--body-font);
+    background-color: var(--stone-gray);
+    color: white;
+    background-image: url('https://images.unsplash.com/photo-1647538722287-8abc5e9240db');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--main-font);
+    color: var(--gold);
+    text-shadow: 2px 2px var(--obsidian-black);
+}
+
+a {
+    color: var(--diamond-blue);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.btn {
+    font-family: var(--pixel-font);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    border: 3px solid var(--obsidian-black);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+    pointer-events: none;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background-color: var(--diamond-blue);
+    color: var(--obsidian-black);
+    border-color: var(--obsidian-black);
+}
+
+.btn-secondary {
+    background-color: var(--grass-green);
+    color: white;
+    border-color: var(--obsidian-black);
+}
+
+.btn-danger {
+    background-color: var(--redstone-red);
+    color: white;
+    border-color: var(--obsidian-black);
+}
+
+.minecraft-container {
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 5px solid var(--dirt-brown);
+    border-radius: 0;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.minecraft-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: var(--grass-green);
+}
+
+/* Header styles */
+.navbar {
+    background-color: var(--obsidian-black);
+    border-bottom: 5px solid var(--dirt-brown);
+    font-family: var(--pixel-font);
+    font-size: 1.2rem;
+}
+
+.navbar-brand {
+    font-family: var(--main-font);
+    color: var(--gold) !important;
+    font-size: 1.5rem;
+    text-shadow: 2px 2px var(--obsidian-black);
+}
+
+.nav-link {
+    color: white !important;
+    margin: 0 10px;
+    padding: 10px !important;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--gold) !important;
+    border-bottom: 2px solid var(--gold);
+}
+
+/* Hero section */
+.hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+/* Features section */
+.features {
+    padding: 60px 0;
+}
+
+.feature-box {
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 3px solid var(--dirt-brown);
+    padding: 20px;
+    margin-bottom: 30px;
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.feature-box h3 {
+    color: var(--gold);
+    margin-bottom: 15px;
+}
+
+/* Cards */
+.card {
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 3px solid var(--dirt-brown);
+    border-radius: 0;
+}
+
+.card-header {
+    background-color: var(--dirt-brown);
+    color: white;
+    font-family: var(--pixel-font);
+    font-size: 1.2rem;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Forms */
+.form-control {
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 2px solid var(--dirt-brown);
+    color: white;
+    border-radius: 0;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background-color: rgba(40, 40, 40, 0.7);
+    border-color: var(--gold);
+    color: white;
+    box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+}
+
+/* Footer */
+footer {
+    background-color: var(--obsidian-black);
+    border-top: 5px solid var(--dirt-brown);
+    padding: 30px 0;
+    color: white;
+    font-family: var(--pixel-font);
+}
+
+.footer-links a {
+    display: block;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.footer-links a:hover {
+    color: var(--gold);
+}
+
+.social-links a {
+    color: white;
+    font-size: 24px;
+    margin: 0 10px;
+}
+
+.social-links a:hover {
+    color: var(--gold);
+}
+
+/* Page-specific styles */
+
+/* Store page */
+.product-card {
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 3px solid var(--dirt-brown);
+    transition: all 0.3s;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--gold);
+}
+
+.product-img {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 3px solid var(--dirt-brown);
+}
+
+.product-price {
+    background-color: var(--gold);
+    color: var(--obsidian-black);
+    font-weight: bold;
+    padding: 5px 10px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: var(--pixel-font);
+}
+
+/* Updates page */
+.update-item {
+    background-color: rgba(30, 30, 30, 0.8);
+    border-left: 5px solid var(--diamond-blue);
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.update-version {
+    color: var(--gold);
+    font-family: var(--pixel-font);
+    font-size: 1.3rem;
+}
+
+.update-date {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Profile page */
+.profile-header {
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 3px solid var(--dirt-brown);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border: 5px solid var(--dirt-brown);
+    border-radius: 0;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    color: var(--gold);
+    font-family: var(--pixel-font);
+}
+
+.stat-label {
+    color: #aaa;
+}
+
+/* Download page */
+.download-option {
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 3px solid var(--dirt-brown);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.download-option:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+}
+
+.download-option h3 {
+    color: var(--gold);
+}
+
+/* Admin page */
+.admin-panel {
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 3px solid var(--redstone-red);
+    padding: 20px;
+}
+
+.admin-card {
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 2px solid var(--stone-gray);
+    margin-bottom: 20px;
+}
+
+.admin-card-header {
+    background-color: var(--redstone-red);
+    color: white;
+    padding: 10px 15px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .nav-link {
+        margin: 5px 0;
+    }
+    
+    .feature-box {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero h1 {
+        font-size: 1.7rem;
+    }
+    
+    .btn {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}

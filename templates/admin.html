@@ -1,0 +1,1647 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .admin-header {
+        background-color: rgba(178, 34, 34, 0.3);
+        border: 3px solid var(--redstone-red);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .admin-header h2 {
+        color: var(--redstone-red);
+    }
+    
+    .admin-nav {
+        background-color: rgba(30, 30, 30, 0.8);
+        border-bottom: 3px solid var(--dirt-brown);
+        margin-bottom: 30px;
+    }
+    
+    .admin-nav-item {
+        display: inline-block;
+        padding: 15px 20px;
+        color: white;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -3px;
+        transition: all 0.3s;
+    }
+    
+    .admin-nav-item:hover, .admin-nav-item.active {
+        color: var(--redstone-red);
+        border-bottom-color: var(--redstone-red);
+    }
+    
+    .admin-content {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+    }
+    
+    .admin-panel {
+        display: none;
+    }
+    
+    .admin-panel.active {
+        display: block;
+    }
+    
+    .user-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--stone-gray);
+        padding: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .user-card.admin {
+        border-left-color: var(--redstone-red);
+    }
+    
+    .user-actions button {
+        margin-left: 5px;
+    }
+    
+    .product-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--gold);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .product-card .row {
+        align-items: center;
+    }
+    
+    .order-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--grass-green);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .status-badge {
+        padding: 5px 10px;
+        display: inline-block;
+        font-size: 0.8rem;
+    }
+    
+    .status-completed {
+        background-color: var(--grass-green);
+        color: white;
+    }
+    
+    .status-pending {
+        background-color: var(--gold);
+        color: black;
+    }
+    
+    .status-failed {
+        background-color: var(--redstone-red);
+        color: white;
+    }
+    
+    .dashboard-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+    
+    .dashboard-card h4 {
+        color: var(--gold);
+        margin-bottom: 20px;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-family: var(--pixel-font);
+        color: var(--diamond-blue);
+        margin-bottom: 10px;
+    }
+    
+    .stat-chart {
+        height: 150px;
+        background-color: rgba(30, 30, 30, 0.5);
+        margin-top: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chart-bar {
+        position: absolute;
+        bottom: 0;
+        width: 8%;
+        background-color: var(--gold);
+        transition: height 1s ease-out;
+    }
+    
+    .update-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--diamond-blue);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .donation-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--redstone-red);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .admin-form label {
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .admin-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .search-box {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #777;
+    }
+    
+    .search-input {
+        padding-left: 35px;
+    }
+    
+    .filter-dropdown {
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 2px solid var(--dirt-brown);
+        margin-bottom: 20px;
+    }
+    
+    .log-entry {
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    }
+    
+    .log-entry:last-child {
+        border-bottom: none;
+    }
+    
+    .log-time {
+        color: #aaa;
+        font-size: 0.8rem;
+    }
+    
+    .log-level-info {
+        color: var(--diamond-blue);
+    }
+    
+    .log-level-warning {
+        color: var(--gold);
+    }
+    
+    .log-level-error {
+        color: var(--redstone-red);
+    }
+    
+    .ticket-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--stone-gray);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .ticket-open {
+        border-left-color: var(--grass-green);
+    }
+    
+    .ticket-pending {
+        border-left-color: var(--gold);
+    }
+    
+    .ticket-closed {
+        border-left-color: var(--redstone-red);
+    }
+    
+    .table-dark {
+        background-color: transparent;
+    }
+    
+    .table-dark th, .table-dark td {
+        border-color: var(--dirt-brown);
+    }
+    
+    .ck-editor__editable {
+        min-height: 200px;
+        color: black;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Admin navigation tabs
+        const navItems = document.querySelectorAll('.admin-nav-item');
+        const adminPanels = document.querySelectorAll('.admin-panel');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all tabs
+                navItems.forEach(nav => nav.classList.remove('active'));
+                adminPanels.forEach(panel => panel.classList.remove('active'));
+                
+                // Add active class to current tab
+                this.classList.add('active');
+                const panelId = this.dataset.panel;
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+        
+        // Generate random chart data for dashboard
+        generateChartData();
+        
+        // Search functionality
+        const searchInputs = document.querySelectorAll('.search-input');
+        searchInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const panelId = this.dataset.targetPanel;
+                
+                if (panelId === 'users-panel') {
+                    searchUsers(searchTerm);
+                } else if (panelId === 'products-panel') {
+                    searchProducts(searchTerm);
+                } else if (panelId === 'orders-panel') {
+                    searchOrders(searchTerm);
+                }
+            });
+        });
+        
+        // User actions
+        setupUserActions();
+        
+        // Form submission handlers
+        setupFormHandlers();
+    });
+    
+    function generateChartData() {
+        const chartBars = document.querySelectorAll('.chart-bar');
+        
+        chartBars.forEach(bar => {
+            const randomHeight = Math.floor(Math.random() * 80) + 20; // 20-100%
+            bar.style.height = randomHeight + '%';
+        });
+    }
+    
+    function searchUsers(term) {
+        const userCards = document.querySelectorAll('.user-card');
+        
+        userCards.forEach(card => {
+            const username = card.querySelector('.user-name').textContent.toLowerCase();
+            const email = card.querySelector('.user-email').textContent.toLowerCase();
+            
+            if (username.includes(term) || email.includes(term)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function searchProducts(term) {
+        const productCards = document.querySelectorAll('.product-card');
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('h5').textContent.toLowerCase();
+            
+            if (productName.includes(term)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function searchOrders(term) {
+        const orderCards = document.querySelectorAll('.order-card');
+        
+        orderCards.forEach(card => {
+            const orderId = card.querySelector('.order-id').textContent.toLowerCase();
+            const username = card.querySelector('.order-user').textContent.toLowerCase();
+            
+            if (orderId.includes(term) || username.includes(term)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function setupUserActions() {
+        // Ban user buttons
+        const banButtons = document.querySelectorAll('.ban-user-btn');
+        banButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const username = this.dataset.username;
+                
+                if (confirm(`Are you sure you want to ban ${username}?`)) {
+                    // Simulate API call
+                    simulateApiCall('Banning user...', `User ${username} has been banned.`);
+                }
+            });
+        });
+        
+        // Make admin buttons
+        const adminButtons = document.querySelectorAll('.make-admin-btn');
+        adminButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const username = this.dataset.username;
+                
+                if (confirm(`Are you sure you want to make ${username} an admin?`)) {
+                    // Simulate API call
+                    simulateApiCall('Updating user role...', `User ${username} is now an admin.`);
+                }
+            });
+        });
+        
+        // Delete user buttons
+        const deleteButtons = document.querySelectorAll('.delete-user-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const username = this.dataset.username;
+                
+                if (confirm(`Are you sure you want to delete ${username}? This action cannot be undone.`)) {
+                    // Simulate API call
+                    simulateApiCall('Deleting user...', `User ${username} has been deleted.`);
+                }
+            });
+        });
+    }
+    
+    function setupFormHandlers() {
+        // Add product form
+        const addProductForm = document.getElementById('add-product-form');
+        if (addProductForm) {
+            addProductForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate form submission
+                simulateApiCall('Adding product...', 'New product has been added successfully.');
+                
+                // Clear form
+                this.reset();
+            });
+        }
+        
+        // Add update form
+        const addUpdateForm = document.getElementById('add-update-form');
+        if (addUpdateForm) {
+            addUpdateForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate form submission
+                simulateApiCall('Publishing update...', 'New update has been published successfully.');
+                
+                // Clear form
+                this.reset();
+            });
+        }
+    }
+    
+    function simulateApiCall(progressMessage, successMessage) {
+        // Create notification
+        const notification = document.createElement('div');
+        notification.className = 'minecraft-alert info notification';
+        notification.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> ${progressMessage}`;
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '1000';
+        notification.style.transition = 'all 0.3s ease-out';
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Simulate API call
+        setTimeout(() => {
+            notification.innerHTML = `<i class="fas fa-check-circle me-2"></i> ${successMessage}`;
+            notification.className = 'minecraft-alert success notification';
+            
+            // Remove after delay
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }, 1500);
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="admin-container">
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">CleanCatClient Admin Panel</h2>
+                <div>
+                    <span class="badge bg-danger">Admin Access</span>
+                    <span class="ms-2">Logged in as: {{ current_user.username }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Navigation -->
+        <div class="admin-nav">
+            <div class="admin-nav-item active" data-panel="dashboard-panel">Dashboard</div>
+            <div class="admin-nav-item" data-panel="users-panel">Users</div>
+            <div class="admin-nav-item" data-panel="products-panel">Products</div>
+            <div class="admin-nav-item" data-panel="orders-panel">Orders</div>
+            <div class="admin-nav-item" data-panel="updates-panel">Updates</div>
+            <div class="admin-nav-item" data-panel="donations-panel">Donations</div>
+            <div class="admin-nav-item" data-panel="support-panel">Support</div>
+            <div class="admin-nav-item" data-panel="logs-panel">System Logs</div>
+        </div>
+        
+        <!-- Admin Content -->
+        <div class="admin-content">
+            <!-- Dashboard Panel -->
+            <div id="dashboard-panel" class="admin-panel active">
+                <h3 class="mb-4">Dashboard</h3>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Total Users</h4>
+                            <div class="stat-number">1,256</div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-arrow-up text-success me-2"></i>
+                                <span>12% increase this month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Revenue</h4>
+                            <div class="stat-number">$8,432</div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-arrow-up text-success me-2"></i>
+                                <span>8% increase this month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Downloads</h4>
+                            <div class="stat-number">15,872</div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-arrow-up text-success me-2"></i>
+                                <span>15% increase this month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Active Users</h4>
+                            <div class="stat-number">892</div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-arrow-up text-success me-2"></i>
+                                <span>5% increase this week</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Revenue Trend (Last 10 Days)</h4>
+                            <div class="stat-chart">
+                                <div class="chart-bar" style="left: 1%; height: 40%;"></div>
+                                <div class="chart-bar" style="left: 11%; height: 55%;"></div>
+                                <div class="chart-bar" style="left: 21%; height: 45%;"></div>
+                                <div class="chart-bar" style="left: 31%; height: 60%;"></div>
+                                <div class="chart-bar" style="left: 41%; height: 75%;"></div>
+                                <div class="chart-bar" style="left: 51%; height: 65%;"></div>
+                                <div class="chart-bar" style="left: 61%; height: 80%;"></div>
+                                <div class="chart-bar" style="left: 71%; height: 70%;"></div>
+                                <div class="chart-bar" style="left: 81%; height: 85%;"></div>
+                                <div class="chart-bar" style="left: 91%; height: 90%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Top Products</h4>
+                            <div class="list-group bg-transparent">
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0 d-flex justify-content-between align-items-center">
+                                    <span>Premium Package</span>
+                                    <span class="badge bg-primary">248 sales</span>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0 d-flex justify-content-between align-items-center">
+                                    <span>Lifetime Package</span>
+                                    <span class="badge bg-primary">156 sales</span>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0 d-flex justify-content-between align-items-center">
+                                    <span>Basic Package</span>
+                                    <span class="badge bg-primary">124 sales</span>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0 d-flex justify-content-between align-items-center">
+                                    <span>Animated Capes Pack</span>
+                                    <span class="badge bg-primary">98 sales</span>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0 d-flex justify-content-between align-items-center">
+                                    <span>Advanced HUD Pack</span>
+                                    <span class="badge bg-primary">87 sales</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Recent Orders</h4>
+                            <div class="list-group bg-transparent">
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Order #CC-1087</h6>
+                                        <small>3 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: PixelMaster99 - $19.99</p>
+                                    <small class="text-success">Completed</small>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Order #CC-1086</h6>
+                                        <small>3 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: BlockBuilder42 - $39.99</p>
+                                    <small class="text-success">Completed</small>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Order #CC-1085</h6>
+                                        <small>4 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: CraftQueen - $12.98</p>
+                                    <small class="text-success">Completed</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-primary btn-sm" onclick="document.querySelector('[data-panel=\'orders-panel\']').click()">View All Orders</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4>Recent Support Tickets</h4>
+                            <div class="list-group bg-transparent">
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Performance issue with v1.1.0</h6>
+                                        <small>2 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: PixelMaster99</p>
+                                    <small class="text-warning">Open</small>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Payment not processed</h6>
+                                        <small>5 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: DiamondHunter</p>
+                                    <small class="text-danger">Closed</small>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Cape not showing in-game</h6>
+                                        <small>6 days ago</small>
+                                    </div>
+                                    <p class="mb-1">User: EndermanKing</p>
+                                    <small class="text-warning">Open</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-primary btn-sm" onclick="document.querySelector('[data-panel=\'support-panel\']').click()">View All Tickets</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Panel -->
+            <div id="users-panel" class="admin-panel">
+                <h3 class="mb-4">User Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search users..." data-target-panel="users-panel">
+                    </div>
+                    <div>
+                        <a href="#" class="minecraft-btn primary">Add New User</a>
+                    </div>
+                </div>
+                
+                <div class="user-list">
+                    <div class="user-card admin">
+                        <div>
+                            <h5 class="user-name">Admin</h5>
+                            <div class="user-email">admin@example.com</div>
+                            <div>
+                                <span class="badge bg-danger">Administrator</span>
+                                <span class="badge bg-primary">Verified</span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm ban-user-btn" data-user-id="1" data-username="Admin">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-card">
+                        <div>
+                            <h5 class="user-name">PixelMaster99</h5>
+                            <div class="user-email">pixelmaster@example.com</div>
+                            <div>
+                                <span class="badge bg-success">Premium</span>
+                                <span class="badge bg-primary">Verified</span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm ban-user-btn" data-user-id="2" data-username="PixelMaster99">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm make-admin-btn" data-user-id="2" data-username="PixelMaster99">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="2" data-username="PixelMaster99">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-card">
+                        <div>
+                            <h5 class="user-name">BlockBuilder42</h5>
+                            <div class="user-email">blockbuilder@example.com</div>
+                            <div>
+                                <span class="badge bg-success">Premium</span>
+                                <span class="badge bg-primary">Verified</span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm ban-user-btn" data-user-id="3" data-username="BlockBuilder42">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm make-admin-btn" data-user-id="3" data-username="BlockBuilder42">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="3" data-username="BlockBuilder42">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-card">
+                        <div>
+                            <h5 class="user-name">CraftQueen</h5>
+                            <div class="user-email">craftqueen@example.com</div>
+                            <div>
+                                <span class="badge bg-success">Premium</span>
+                                <span class="badge bg-primary">Verified</span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm ban-user-btn" data-user-id="4" data-username="CraftQueen">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm make-admin-btn" data-user-id="4" data-username="CraftQueen">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="4" data-username="CraftQueen">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-card">
+                        <div>
+                            <h5 class="user-name">DiamondHunter</h5>
+                            <div class="user-email">diamondhunter@example.com</div>
+                            <div>
+                                <span class="badge bg-secondary">Free</span>
+                                <span class="badge bg-primary">Verified</span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm ban-user-btn" data-user-id="5" data-username="DiamondHunter">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm make-admin-btn" data-user-id="5" data-username="DiamondHunter">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="5" data-username="DiamondHunter">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        <select class="minecraft-input form-control">
+                            <option>10 users per page</option>
+                            <option>25 users per page</option>
+                            <option>50 users per page</option>
+                        </select>
+                    </div>
+                    <div>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Panel -->
+            <div id="products-panel" class="admin-panel">
+                <h3 class="mb-4">Product Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search products..." data-target-panel="products-panel">
+                    </div>
+                    <div>
+                        <button class="minecraft-btn primary" data-bs-toggle="collapse" data-bs-target="#add-product-form-container">Add New Product</button>
+                    </div>
+                </div>
+                
+                <!-- Add Product Form -->
+                <div class="collapse mb-4" id="add-product-form-container">
+                    <div class="minecraft-panel">
+                        <h4 class="mb-3">Add New Product</h4>
+                        <form id="add-product-form" class="admin-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="product-name">Product Name</label>
+                                        <input type="text" id="product-name" class="minecraft-input form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="product-price">Price ($)</label>
+                                        <input type="number" id="product-price" class="minecraft-input form-control" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-description">Description</label>
+                                <textarea id="product-description" class="minecraft-input form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="product-category">Category</label>
+                                        <select id="product-category" class="minecraft-input form-control" required>
+                                            <option value="">Select Category</option>
+                                            <option value="package">Package</option>
+                                            <option value="cosmetic">Cosmetic</option>
+                                            <option value="feature">Feature</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="product-image">Image URL</label>
+                                        <input type="text" id="product-image" class="minecraft-input form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="minecraft-btn primary">Add Product</button>
+                                <button type="button" class="minecraft-btn secondary ms-2" data-bs-toggle="collapse" data-bs-target="#add-product-form-container">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="product-list">
+                    <div class="product-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Basic Package</h5>
+                                <p>Access to basic features</p>
+                                <div>
+                                    <span class="badge bg-primary">Package</span>
+                                    <span class="badge bg-success">$9.99</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Premium Package</h5>
+                                <p>Access to premium features</p>
+                                <div>
+                                    <span class="badge bg-primary">Package</span>
+                                    <span class="badge bg-success">$19.99</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Ultimate Package</h5>
+                                <p>Access to all features</p>
+                                <div>
+                                    <span class="badge bg-primary">Package</span>
+                                    <span class="badge bg-success">$29.99</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Animated Capes Pack</h5>
+                                <p>A collection of 10 animated capes</p>
+                                <div>
+                                    <span class="badge bg-info">Cosmetic</span>
+                                    <span class="badge bg-success">$4.99</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Advanced HUD Pack</h5>
+                                <p>Customize your game interface with advanced HUD elements</p>
+                                <div>
+                                    <span class="badge bg-warning text-dark">Feature</span>
+                                    <span class="badge bg-success">$7.99</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orders Panel -->
+            <div id="orders-panel" class="admin-panel">
+                <h3 class="mb-4">Order Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search orders..." data-target-panel="orders-panel">
+                    </div>
+                    <div>
+                        <select class="filter-dropdown form-select">
+                            <option value="all">All Orders</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="order-list">
+                    <div class="order-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="order-id">Order #CC-1087</span>
+                                <span class="ms-3">March 8, 2023</span>
+                            </div>
+                            <div>
+                                <span class="status-badge status-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong class="order-user">PixelMaster99</strong> | 
+                            <span>pixelmaster@example.com</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span>Premium Package</span>
+                            </div>
+                            <div>
+                                <strong>$19.99</strong>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary">View Details</button>
+                            <button class="btn btn-sm btn-secondary">Send Email</button>
+                            <button class="btn btn-sm btn-danger">Refund</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="order-id">Order #CC-1086</span>
+                                <span class="ms-3">March 7, 2023</span>
+                            </div>
+                            <div>
+                                <span class="status-badge status-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong class="order-user">BlockBuilder42</strong> | 
+                            <span>blockbuilder@example.com</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span>Lifetime Package</span>
+                            </div>
+                            <div>
+                                <strong>$39.99</strong>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary">View Details</button>
+                            <button class="btn btn-sm btn-secondary">Send Email</button>
+                            <button class="btn btn-sm btn-danger">Refund</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="order-id">Order #CC-1085</span>
+                                <span class="ms-3">March 6, 2023</span>
+                            </div>
+                            <div>
+                                <span class="status-badge status-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong class="order-user">DiamondHunter</strong> | 
+                            <span>diamondhunter@example.com</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span>Advanced HUD Pack</span>
+                            </div>
+                            <div>
+                                <strong>$7.99</strong>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary">View Details</button>
+                            <button class="btn btn-sm btn-success">Approve</button>
+                            <button class="btn btn-sm btn-danger">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="order-id">Order #CC-1084</span>
+                                <span class="ms-3">March 5, 2023</span>
+                            </div>
+                            <div>
+                                <span class="status-badge status-failed">Failed</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong class="order-user">EndermanKing</strong> | 
+                            <span>enderman@example.com</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span>Custom Particles Pack</span>
+                            </div>
+                            <div>
+                                <strong>$3.99</strong>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary">View Details</button>
+                            <button class="btn btn-sm btn-secondary">Send Email</button>
+                            <button class="btn btn-sm btn-success">Retry Payment</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        <select class="minecraft-input form-control">
+                            <option>10 orders per page</option>
+                            <option>25 orders per page</option>
+                            <option>50 orders per page</option>
+                        </select>
+                    </div>
+                    <div>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Updates Panel -->
+            <div id="updates-panel" class="admin-panel">
+                <h3 class="mb-4">Update Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search updates...">
+                    </div>
+                    <div>
+                        <button class="minecraft-btn primary" data-bs-toggle="collapse" data-bs-target="#add-update-form-container">Add New Update</button>
+                    </div>
+                </div>
+                
+                <!-- Add Update Form -->
+                <div class="collapse mb-4" id="add-update-form-container">
+                    <div class="minecraft-panel">
+                        <h4 class="mb-3">Add New Update</h4>
+                        <form id="add-update-form" class="admin-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="update-version">Version</label>
+                                        <input type="text" id="update-version" class="minecraft-input form-control" placeholder="e.g., 1.2.0" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="update-date">Release Date</label>
+                                        <input type="date" id="update-date" class="minecraft-input form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="update-title">Title</label>
+                                <input type="text" id="update-title" class="minecraft-input form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="update-description">Description</label>
+                                <textarea id="update-description" class="minecraft-input form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="update-changes">Changelog</label>
+                                <textarea id="update-changes" class="minecraft-input form-control" rows="5" placeholder="- Added feature X
+- Fixed bug Y
+- Improved performance of Z" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="update-download">Download URL</label>
+                                <input type="text" id="update-download" class="minecraft-input form-control" required>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="minecraft-btn primary">Publish Update</button>
+                                <button type="button" class="minecraft-btn secondary ms-2" data-bs-toggle="collapse" data-bs-target="#add-update-form-container">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="update-list">
+                    <div class="update-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">v1.1.0</span>
+                                <span class="ms-2">March 10, 2023</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        <h5>Major Feature Update</h5>
+                        <p>This update introduces several new features and improvements to enhance your gameplay experience.</p>
+                        <div class="mb-2">
+                            <strong>Download count:</strong> 15,426
+                        </div>
+                    </div>
+                    
+                    <div class="update-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">v1.0.1</span>
+                                <span class="ms-2">February 1, 2023</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        <h5>Bug Fixes & Improvements</h5>
+                        <p>This maintenance update addresses several bugs and improves stability.</p>
+                        <div class="mb-2">
+                            <strong>Download count:</strong> 12,873
+                        </div>
+                    </div>
+                    
+                    <div class="update-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">v1.0.0</span>
+                                <span class="ms-2">January 15, 2023</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        <h5>Initial Release</h5>
+                        <p>The first public release of CleanCatClient with core features and optimizations.</p>
+                        <div class="mb-2">
+                            <strong>Download count:</strong> 10,145
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Donations Panel -->
+            <div id="donations-panel" class="admin-panel">
+                <h3 class="mb-4">Donation Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search donations...">
+                    </div>
+                    <div>
+                        <select class="filter-dropdown form-select">
+                            <option value="all">All Donations</option>
+                            <option value="supporter">Supporter Tier</option>
+                            <option value="elite">Elite Tier</option>
+                            <option value="developer">Developer Tier</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="donation-list">
+                    <div class="donation-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Donation #D-342</span>
+                                <span class="ms-2">March 10, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-gold" style="background-color: var(--gold); color: black;">Developer Tier ($50)</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong>User:</strong> BlockBuilder42 (blockbuilder@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Message:</strong> Keep up the amazing work! The client has improved my Minecraft experience so much.
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Payment Method:</strong> Credit Card
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">Send Thank You</button>
+                                <button class="btn btn-sm btn-secondary">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Donation #D-341</span>
+                                <span class="ms-2">March 5, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-info" style="background-color: var(--diamond-blue); color: black;">Elite Tier ($20)</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong>User:</strong> DiamondHunter (diamondhunter@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Message:</strong> Love the performance improvements in the latest update!
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Payment Method:</strong> PayPal
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">Send Thank You</button>
+                                <button class="btn btn-sm btn-secondary">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Donation #D-340</span>
+                                <span class="ms-2">February 28, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-success" style="background-color: var(--grass-green);">Supporter Tier ($5)</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong>User:</strong> CraftQueen (craftqueen@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Message:</strong> Happy to support this awesome project!
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Payment Method:</strong> Crypto (BTC)
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">Send Thank You</button>
+                                <button class="btn btn-sm btn-secondary">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="minecraft-panel mt-4">
+                    <h4 class="mb-4">Donation Statistics</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div>
+                                <strong>Total Donations:</strong>
+                            </div>
+                            <div class="stat-number">$1,245</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div>
+                                <strong>This Month:</strong>
+                            </div>
+                            <div class="stat-number">$342</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div>
+                                <strong>Donation Count:</strong>
+                            </div>
+                            <div class="stat-number">78</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div>
+                                <strong>Average Donation:</strong>
+                            </div>
+                            <div class="stat-number">$15.96</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Support Panel -->
+            <div id="support-panel" class="admin-panel">
+                <h3 class="mb-4">Support Ticket Management</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search tickets...">
+                    </div>
+                    <div>
+                        <select class="filter-dropdown form-select">
+                            <option value="all">All Tickets</option>
+                            <option value="open">Open</option>
+                            <option value="pending">Pending</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="ticket-list">
+                    <div class="ticket-card ticket-open">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Ticket #T-2156</span>
+                                <span class="ms-2">March 12, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-success">Open</span>
+                            </div>
+                        </div>
+                        <h5>Performance issue with v1.1.0</h5>
+                        <div class="mb-2">
+                            <strong>User:</strong> PixelMaster99 (pixelmaster@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Description:</strong> I'm experiencing FPS drops when using shader packs with the latest version.
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Priority:</strong> High
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">Respond</button>
+                                <button class="btn btn-sm btn-warning">Mark Pending</button>
+                                <button class="btn btn-sm btn-success">Resolve</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-card ticket-closed">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Ticket #T-1982</span>
+                                <span class="ms-2">February 25, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-danger">Closed</span>
+                            </div>
+                        </div>
+                        <h5>Payment not processed</h5>
+                        <div class="mb-2">
+                            <strong>User:</strong> DiamondHunter (diamondhunter@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Description:</strong> My payment was charged but I didn't receive the Premium Package.
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Priority:</strong> High
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">View Details</button>
+                                <button class="btn btn-sm btn-warning">Reopen</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-card ticket-pending">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="badge bg-primary">Ticket #T-2012</span>
+                                <span class="ms-2">March 1, 2023</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </div>
+                        </div>
+                        <h5>Cape not showing in-game</h5>
+                        <div class="mb-2">
+                            <strong>User:</strong> EndermanKing (enderman@example.com)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Description:</strong> I purchased the animated cape pack but it's not showing up in my game.
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Priority:</strong> Medium
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary">Respond</button>
+                                <button class="btn btn-sm btn-success">Resolve</button>
+                                <button class="btn btn-sm btn-danger">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Logs Panel -->
+            <div id="logs-panel" class="admin-panel">
+                <h3 class="mb-4">System Logs</h3>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="minecraft-input form-control search-input" placeholder="Search logs...">
+                    </div>
+                    <div>
+                        <select class="filter-dropdown form-select">
+                            <option value="all">All Logs</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="minecraft-panel">
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-info">[INFO]</span>
+                            <span class="log-time">2023-03-15 14:32:45</span>
+                        </div>
+                        <div>User PixelMaster99 logged in successfully.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-info">[INFO]</span>
+                            <span class="log-time">2023-03-15 14:30:12</span>
+                        </div>
+                        <div>Order #CC-1087 processed successfully.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-warning">[WARNING]</span>
+                            <span class="log-time">2023-03-15 14:28:03</span>
+                        </div>
+                        <div>Multiple failed login attempts for user DiamondHunter.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-error">[ERROR]</span>
+                            <span class="log-time">2023-03-15 14:20:55</span>
+                        </div>
+                        <div>Database connection timeout during order processing. Order #CC-1085 affected.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-info">[INFO]</span>
+                            <span class="log-time">2023-03-15 14:15:22</span>
+                        </div>
+                        <div>User BlockBuilder42 downloaded CleanCatClient v1.1.0.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-info">[INFO]</span>
+                            <span class="log-time">2023-03-15 14:10:35</span>
+                        </div>
+                        <div>New user registered: CraftQueen (craftqueen@example.com).</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-warning">[WARNING]</span>
+                            <span class="log-time">2023-03-15 14:05:11</span>
+                        </div>
+                        <div>High server load detected. CPU usage at 85%.</div>
+                    </div>
+                    
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-level-error">[ERROR]</span>
+                            <span class="log-time">2023-03-15 14:00:32</span>
+                        </div>
+                        <div>Payment gateway connection failed. Retry mechanism activated.</div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        <button class="minecraft-btn secondary">Refresh Logs</button>
+                        <button class="minecraft-btn danger ms-2">Clear Logs</button>
+                    </div>
+                    <div>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

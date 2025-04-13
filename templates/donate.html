@@ -1,0 +1,644 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .donation-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .donation-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .donation-tier {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .donation-tier:hover {
+        transform: translateY(-10px);
+        border-color: var(--gold);
+    }
+    
+    .tier-highlight {
+        border-color: var(--gold);
+        position: relative;
+    }
+    
+    .tier-highlight::before {
+        content: 'POPULAR';
+        position: absolute;
+        top: 15px;
+        right: -35px;
+        background-color: var(--gold);
+        color: black;
+        font-family: var(--pixel-font);
+        font-size: 0.8rem;
+        padding: 5px 40px;
+        transform: rotate(45deg);
+        z-index: 1;
+    }
+    
+    .tier-name {
+        font-family: var(--pixel-font);
+        font-size: 1.8rem;
+        color: var(--gold);
+        margin-bottom: 15px;
+    }
+    
+    .tier-price {
+        font-size: 2.5rem;
+        font-family: var(--main-font);
+        color: white;
+        margin-bottom: 20px;
+    }
+    
+    .tier-description {
+        margin-bottom: 20px;
+    }
+    
+    .tier-features {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 30px;
+    }
+    
+    .tier-features li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+        position: relative;
+        padding-left: 25px;
+    }
+    
+    .tier-features li:last-child {
+        border-bottom: none;
+    }
+    
+    .tier-features li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--grass-green);
+    }
+    
+    .custom-donation {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .custom-amount-input {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .currency-symbol {
+        background-color: var(--dirt-brown);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        border: 2px solid black;
+        border-right: none;
+        font-weight: bold;
+    }
+    
+    .amount-input {
+        flex-grow: 1;
+        border-left: none;
+    }
+    
+    .donation-message {
+        margin-bottom: 20px;
+    }
+    
+    .donation-perks {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--gold);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .perk-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .perk-icon {
+        width: 50px;
+        height: 50px;
+        background-color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 15px;
+        color: var(--obsidian-black);
+    }
+    
+    .donor-wall {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-top: 50px;
+    }
+    
+    .donor-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .donor-item {
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 2px solid var(--stone-gray);
+        padding: 15px;
+        width: calc(50% - 15px);
+        display: flex;
+        align-items: center;
+    }
+    
+    .donor-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--grass-green);
+        margin-right: 15px;
+    }
+    
+    .donor-tier {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        margin-left: 10px;
+    }
+    
+    .tier-gold {
+        background-color: var(--gold);
+        color: black;
+    }
+    
+    .tier-diamond {
+        background-color: var(--diamond-blue);
+        color: black;
+    }
+    
+    .tier-emerald {
+        background-color: var(--grass-green);
+        color: white;
+    }
+    
+    .payment-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .payment-option {
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 2px solid var(--stone-gray);
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .payment-option:hover, .payment-option.selected {
+        border-color: var(--gold);
+    }
+    
+    .payment-option i {
+        margin-right: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        .donor-item {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select donation tier
+        const tierButtons = document.querySelectorAll('.select-tier-btn');
+        tierButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const amount = this.dataset.amount;
+                document.getElementById('custom-amount').value = amount;
+                
+                // Scroll to custom donation form
+                const customDonation = document.querySelector('.custom-donation');
+                customDonation.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        
+        // Payment option selection
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+        
+        // Donation form validation
+        const donationForm = document.getElementById('donation-form');
+        if (donationForm) {
+            donationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const amount = document.getElementById('custom-amount').value;
+                if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                    alert('Please enter a valid donation amount');
+                    return;
+                }
+                
+                const selectedPayment = document.querySelector('.payment-option.selected');
+                if (!selectedPayment) {
+                    alert('Please select a payment method');
+                    return;
+                }
+                
+                // Show processing state
+                const donateBtn = this.querySelector('button[type="submit"]');
+                donateBtn.disabled = true;
+                donateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Simulate processing
+                setTimeout(() => {
+                    // Show success message
+                    const donationContainer = document.querySelector('.donation-container');
+                    donationContainer.innerHTML = `
+                        <div class="minecraft-panel text-center py-5">
+                            <i class="fas fa-heart fa-5x mb-4" style="color: var(--redstone-red);"></i>
+                            <h2 class="minecraft-title gold mb-4">Thank You for Your Support!</h2>
+                            <p class="mb-4">Your donation of $${parseFloat(amount).toFixed(2)} has been processed successfully.</p>
+                            <p class="mb-4">Your support helps us continue developing CleanCatClient and bringing new features to the community.</p>
+                            <div class="mt-4">
+                                <a href="{{ url_for('index') }}" class="minecraft-btn primary">Return to Homepage</a>
+                            </div>
+                        </div>
+                    `;
+                }, 2000);
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="donation-container">
+        <div class="donation-header">
+            <h1 class="minecraft-title diamond mb-4">Support CleanCatClient</h1>
+            <p class="lead mb-5">Your donations help us continue developing and improving CleanCatClient. Choose a donation tier or make a custom donation below.</p>
+        </div>
+        
+        <!-- Donation Tiers -->
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="donation-tier">
+                    <div class="tier-name">Supporter</div>
+                    <div class="tier-price">$5</div>
+                    <div class="tier-description">Show your support with a small contribution</div>
+                    <ul class="tier-features">
+                        <li>Name on Donor Wall</li>
+                        <li>Supporter Badge</li>
+                        <li>Special Discord Role</li>
+                    </ul>
+                    <button class="minecraft-btn primary w-100 select-tier-btn" data-amount="5">Select</button>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="donation-tier tier-highlight">
+                    <div class="tier-name">Elite</div>
+                    <div class="tier-price">$20</div>
+                    <div class="tier-description">Become an elite supporter with additional perks</div>
+                    <ul class="tier-features">
+                        <li>Name on Donor Wall</li>
+                        <li>Elite Badge</li>
+                        <li>Special Discord Role</li>
+                        <li>Exclusive Cape</li>
+                        <li>Early Access to Beta Features</li>
+                    </ul>
+                    <button class="minecraft-btn gold w-100 select-tier-btn" data-amount="20">Select</button>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="donation-tier">
+                    <div class="tier-name">Developer</div>
+                    <div class="tier-price">$50</div>
+                    <div class="tier-description">Support development at the highest level</div>
+                    <ul class="tier-features">
+                        <li>Name on Donor Wall</li>
+                        <li>Developer Badge</li>
+                        <li>Special Discord Role</li>
+                        <li>Exclusive Cape Collection</li>
+                        <li>Early Access to Beta Features</li>
+                        <li>Monthly Developer Chat Access</li>
+                        <li>Input on Future Features</li>
+                    </ul>
+                    <button class="minecraft-btn primary w-100 select-tier-btn" data-amount="50">Select</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Custom Donation -->
+        <div class="custom-donation">
+            <h3 class="mb-4">Custom Donation</h3>
+            <form id="donation-form">
+                <div class="mb-4">
+                    <label class="form-label">Donation Amount</label>
+                    <div class="custom-amount-input">
+                        <div class="currency-symbol">$</div>
+                        <input type="number" min="1" step="0.01" class="minecraft-input form-control amount-input" id="custom-amount" placeholder="Enter amount">
+                    </div>
+                </div>
+                
+                <div class="mb-4 donation-message">
+                    <label class="form-label">Message (Optional)</label>
+                    <textarea class="minecraft-input form-control" rows="3" placeholder="Leave a message for the dev team..."></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Display Name on Donor Wall (Optional)</label>
+                    <input type="text" class="minecraft-input form-control" placeholder="Your display name">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Payment Method</label>
+                    <div class="payment-options">
+                        <div class="payment-option selected">
+                            <i class="far fa-credit-card"></i> Credit Card
+                        </div>
+                        <div class="payment-option">
+                            <i class="fab fa-paypal"></i> PayPal
+                        </div>
+                        <div class="payment-option">
+                            <i class="fab fa-bitcoin"></i> Crypto
+                        </div>
+                        <div class="payment-option">
+                            <i class="fab fa-apple-pay"></i> Apple Pay
+                        </div>
+                        <div class="payment-option">
+                            <i class="fab fa-google-pay"></i> Google Pay
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="minecraft-btn gold">Make Donation</button>
+            </form>
+        </div>
+        
+        <!-- Donation Perks -->
+        <div class="donation-perks">
+            <h3 class="mb-4">Donation Perks</h3>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div>
+                            <h5>Exclusive Badges</h5>
+                            <p class="mb-0">Show off your support with exclusive profile badges</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div>
+                            <h5>Custom Capes</h5>
+                            <p class="mb-0">Stand out with donor-exclusive capes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h5>Discord Benefits</h5>
+                            <p class="mb-0">Special roles and access to donor-only channels</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div>
+                            <h5>Early Access</h5>
+                            <p class="mb-0">Try new features before they're released</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <h5>Developer Chats</h5>
+                            <p class="mb-0">Join monthly Q&A sessions with our dev team</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="perk-item">
+                        <div class="perk-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h5>Feature Input</h5>
+                            <p class="mb-0">Help shape the future of CleanCatClient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Where Your Donation Goes -->
+        <div class="minecraft-panel mb-5">
+            <h3 class="mb-4">Where Your Donation Goes</h3>
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="progress minecraft-progress mb-4">
+                        <div class="minecraft-progress-bar" style="width: 40%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>Server Costs</div>
+                        <div>40%</div>
+                    </div>
+                    
+                    <div class="progress minecraft-progress mb-4 mt-4">
+                        <div class="minecraft-progress-bar" style="width: 35%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>Development</div>
+                        <div>35%</div>
+                    </div>
+                    
+                    <div class="progress minecraft-progress mb-4 mt-4">
+                        <div class="minecraft-progress-bar" style="width: 15%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>Community Events</div>
+                        <div>15%</div>
+                    </div>
+                    
+                    <div class="progress minecraft-progress mb-4 mt-4">
+                        <div class="minecraft-progress-bar" style="width: 10%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>Marketing</div>
+                        <div>10%</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p>Your donations directly support the ongoing development and maintenance of CleanCatClient. Here's how we allocate funds:</p>
+                    <ul>
+                        <li><strong>Server Costs (40%):</strong> Maintaining our infrastructure, download servers, and website.</li>
+                        <li><strong>Development (35%):</strong> Supporting our developers who work tirelessly to improve CleanCatClient.</li>
+                        <li><strong>Community Events (15%):</strong> Hosting tournaments, giveaways, and other community activities.</li>
+                        <li><strong>Marketing (10%):</strong> Spreading the word about CleanCatClient to grow our community.</li>
+                    </ul>
+                    <p>We're committed to transparency in how we use your donations. Thank you for your support!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Donor Wall -->
+        <div class="donor-wall">
+            <h3 class="mb-4">Donor Wall</h3>
+            <p>A heartfelt thank you to all our supporters who help make CleanCatClient possible!</p>
+            
+            <div class="donor-list">
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1634580285846-374f22b48c7d" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>PixelMaster99</span>
+                            <span class="donor-tier tier-diamond">Elite</span>
+                        </div>
+                        <small class="text-muted">March 10, 2023</small>
+                    </div>
+                </div>
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1562229125-6d6075419a22" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>BlockBuilder42</span>
+                            <span class="donor-tier tier-gold">Developer</span>
+                        </div>
+                        <small class="text-muted">March 5, the3</small>
+                    </div>
+                </div>
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1587573089734-09cb69c0f2b4" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>CraftQueen</span>
+                            <span class="donor-tier tier-emerald">Supporter</span>
+                        </div>
+                        <small class="text-muted">February 28, 2023</small>
+                    </div>
+                </div>
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1524685794168-52985e79c1f8" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>DiamondHunter</span>
+                            <span class="donor-tier tier-diamond">Elite</span>
+                        </div>
+                        <small class="text-muted">February 20, 2023</small>
+                    </div>
+                </div>
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1648830779899-45dcc4cc6ea6" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>RedstoneWizard</span>
+                            <span class="donor-tier tier-gold">Developer</span>
+                        </div>
+                        <small class="text-muted">February 15, 2023</small>
+                    </div>
+                </div>
+                <div class="donor-item">
+                    <div class="donor-avatar">
+                        <img src="https://images.unsplash.com/photo-1613645695025-20e3f38de4a6" alt="Donor Avatar" class="img-fluid pixelated">
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <span>EndermanKing</span>
+                            <span class="donor-tier tier-emerald">Supporter</span>
+                        </div>
+                        <small class="text-muted">February 10, 2023</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ -->
+        <div class="minecraft-panel mt-5">
+            <h3 class="mb-4">Frequently Asked Questions</h3>
+            
+            <div class="mb-4">
+                <h5>Is my donation tax-deductible?</h5>
+                <p>No, donations to CleanCatClient are not tax-deductible as we are not a registered non-profit organization.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>How quickly will I receive my donor perks?</h5>
+                <p>Most perks are automatically applied within 24 hours. For special items like custom capes, it may take up to 3 business days.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>Can I donate with cryptocurrencies?</h5>
+                <p>Yes, we accept Bitcoin, Ethereum, and several other cryptocurrencies. Select the "Crypto" option at checkout.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>I donated but haven't received my perks. What should I do?</h5>
+                <p>Please contact our support team through the <a href="{{ url_for('profile') }}">support tab</a> in your profile, and we'll resolve the issue as quickly as possible.</p>
+            </div>
+            
+            <div>
+                <h5>Can I upgrade my donation tier later?</h5>
+                <p>Yes, you can make additional donations at any time to reach higher tier benefits.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

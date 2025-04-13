@@ -1,0 +1,672 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .download-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .download-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .version-card {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+        height: 100%;
+        position: relative;
+    }
+    
+    .version-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold);
+    }
+    
+    .version-card.recommended {
+        border-color: var(--gold);
+        position: relative;
+    }
+    
+    .version-card.recommended::before {
+        content: 'RECOMMENDED';
+        position: absolute;
+        top: 15px;
+        right: -35px;
+        background-color: var(--gold);
+        color: black;
+        font-family: var(--pixel-font);
+        font-size: 0.8rem;
+        padding: 5px 40px;
+        transform: rotate(45deg);
+        z-index: 1;
+    }
+    
+    .version-number {
+        font-family: var(--pixel-font);
+        font-size: 1.8rem;
+        color: var(--gold);
+        margin-bottom: 10px;
+    }
+    
+    .version-date {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .version-features {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 25px;
+    }
+    
+    .version-features li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+        position: relative;
+        padding-left: 25px;
+    }
+    
+    .version-features li:last-child {
+        border-bottom: none;
+    }
+    
+    .version-features li::before {
+        content: '✦';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        color: var(--gold);
+    }
+    
+    .download-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-family: var(--pixel-font);
+        color: var(--diamond-blue);
+    }
+    
+    .stat-label {
+        color: #aaa;
+        font-size: 0.8rem;
+    }
+    
+    .system-requirements {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-top: 50px;
+        margin-bottom: 30px;
+    }
+    
+    .req-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .req-table th, 
+    .req-table td {
+        padding: 12px 15px;
+        border: 1px solid var(--dirt-brown);
+    }
+    
+    .req-table th {
+        background-color: rgba(40, 40, 40, 0.8);
+        font-family: var(--pixel-font);
+        color: var(--gold);
+    }
+    
+    .req-table tr:nth-child(even) td {
+        background-color: rgba(45, 45, 45, 0.8);
+    }
+    
+    .installation-steps {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .step-item {
+        display: flex;
+        margin-bottom: 25px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background-color: var(--dirt-brown);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--pixel-font);
+        font-size: 1.2rem;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+    
+    .download-options {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .mirror-option {
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 2px solid var(--stone-gray);
+        transition: all 0.3s;
+    }
+    
+    .mirror-option:hover {
+        border-color: var(--gold);
+        background-color: rgba(60, 60, 60, 0.8);
+    }
+    
+    .download-progress {
+        display: none;
+        margin-top: 30px;
+    }
+    
+    .minecraft-progress {
+        height: 30px;
+        background-color: #2E2E2E;
+        border: 3px solid #000;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 15px;
+    }
+    
+    .minecraft-progress-bar {
+        height: 100%;
+        background-color: #5D8544;
+        transition: width 0.3s;
+        position: relative;
+    }
+    
+    .platform-icons {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    
+    .platform-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--stone-gray);
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .platform-windows {
+        background-color: #0078D7;
+    }
+    
+    .platform-mac {
+        background-color: #999;
+    }
+    
+    .platform-linux {
+        background-color: #333;
+    }
+    
+    .beta-warning {
+        background-color: rgba(178, 34, 34, 0.3);
+        border: 2px solid var(--redstone-red);
+        padding: 15px;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Download button functionality
+        const downloadButtons = document.querySelectorAll('.download-btn');
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const version = this.dataset.version;
+                const downloadProgressContainer = document.getElementById('download-progress');
+                const downloadProgress = document.getElementById('progress-bar');
+                const downloadStatus = document.getElementById('download-status');
+                
+                // Show download progress
+                downloadProgressContainer.style.display = 'block';
+                
+                // Scroll to progress
+                downloadProgressContainer.scrollIntoView({ behavior: 'smooth' });
+                
+                // Simulate download progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // Complete download
+                        downloadStatus.textContent = 'Download complete!';
+                        
+                        // Reset after a delay
+                        setTimeout(() => {
+                            downloadProgressContainer.style.display = 'none';
+                            downloadProgress.style.width = '0%';
+                            
+                            // Show download complete notification
+                            showDownloadComplete(version);
+                        }, 2000);
+                    }
+                    
+                    // Update progress
+                    downloadProgress.style.width = progress + '%';
+                    downloadStatus.textContent = 'Downloading ' + version + ' (' + Math.round(progress) + '%)';
+                }, 200);
+                
+                // Play download sound
+                playDownloadSound();
+            });
+        });
+        
+        // Mirror selection
+        const mirrorOptions = document.querySelectorAll('.mirror-option');
+        mirrorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                mirrorOptions.forEach(opt => {
+                    opt.style.borderColor = 'var(--stone-gray)';
+                    opt.style.backgroundColor = 'rgba(40, 40, 40, 0.8)';
+                });
+                
+                this.style.borderColor = 'var(--gold)';
+                this.style.backgroundColor = 'rgba(60, 60, 60, 0.8)';
+            });
+        });
+    });
+    
+    function playDownloadSound() {
+        console.log("Download started sound played");
+        // This would play a sound in a real implementation
+    }
+    
+    function showDownloadComplete(version) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'minecraft-alert success notification';
+        notification.innerHTML = `Download of ${version} completed successfully!`;
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '1000';
+        notification.style.transition = 'all 0.3s ease-out';
+        notification.style.transform = 'translateX(100%)';
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Slide in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 50);
+        
+        // Remove after delay
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 5000);
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="download-container">
+        <div class="download-header">
+            <h1 class="minecraft-title diamond mb-4">Download CleanCatClient</h1>
+            <p class="lead mb-5">Get the latest version of CleanCatClient and enhance your Minecraft experience with improved performance and features.</p>
+        </div>
+        
+        <!-- Download Statistics -->
+        <div class="minecraft-panel mb-5">
+            <h3 class="mb-4">Download Statistics</h3>
+            <div class="download-stats">
+                <div class="stat-item">
+                    <div class="stat-value">150,000+</div>
+                    <div class="stat-label">Total Downloads</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">v1.1.0</div>
+                    <div class="stat-label">Latest Version</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">March 10, 2023</div>
+                    <div class="stat-label">Last Updated</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">25,000+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Version Cards -->
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="version-card recommended">
+                    <div class="platform-icons">
+                        <div class="platform-icon platform-windows"><i class="fab fa-windows"></i></div>
+                        <div class="platform-icon platform-mac"><i class="fab fa-apple"></i></div>
+                        <div class="platform-icon platform-linux"><i class="fab fa-linux"></i></div>
+                    </div>
+                    <div class="version-number">v1.1.0</div>
+                    <div class="version-date">Released: March 10, 2023</div>
+                    <p>Latest stable release with new features and improvements.</p>
+                    <ul class="version-features">
+                        <li>New cosmetic options</li>
+                        <li>Performance improvements</li>
+                        <li>Enhanced mod compatibility</li>
+                        <li>Custom hotkeys</li>
+                    </ul>
+                    <a href="#" class="minecraft-btn primary w-100 download-btn" data-version="CleanCatClient-v1.1.0">
+                        Download v1.1.0
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="version-card">
+                    <div class="platform-icons">
+                        <div class="platform-icon platform-windows"><i class="fab fa-windows"></i></div>
+                        <div class="platform-icon platform-mac"><i class="fab fa-apple"></i></div>
+                        <div class="platform-icon platform-linux"><i class="fab fa-linux"></i></div>
+                    </div>
+                    <div class="version-number">v1.0.1</div>
+                    <div class="version-date">Released: February 1, 2023</div>
+                    <p>Maintenance update with bug fixes and stability improvements.</p>
+                    <ul class="version-features">
+                        <li>Fixed memory leak</li>
+                        <li>Improved chunk loading</li>
+                        <li>Fixed compatibility issues</li>
+                        <li>UI improvements</li>
+                    </ul>
+                    <a href="#" class="minecraft-btn primary w-100 download-btn" data-version="CleanCatClient-v1.0.1">
+                        Download v1.0.1
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="version-card">
+                    <div class="platform-icons">
+                        <div class="platform-icon platform-windows"><i class="fab fa-windows"></i></div>
+                        <div class="platform-icon platform-mac"><i class="fab fa-apple"></i></div>
+                        <div class="platform-icon platform-linux"><i class="fab fa-linux"></i></div>
+                    </div>
+                    <div class="version-number">v1.0.0</div>
+                    <div class="version-date">Released: January 15, 2023</div>
+                    <p>Initial release with core features and optimizations.</p>
+                    <ul class="version-features">
+                        <li>Performance optimizations</li>
+                        <li>HUD customization</li>
+                        <li>Custom keybindings</li>
+                        <li>Screenshot manager</li>
+                    </ul>
+                    <a href="#" class="minecraft-btn primary w-100 download-btn" data-version="CleanCatClient-v1.0.0">
+                        Download v1.0.0
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Beta Version -->
+        <div class="minecraft-panel mt-4 mb-5">
+            <h3 class="mb-3">Beta Version</h3>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="version-number">v1.2.0-beta</div>
+                    <div class="version-date">Released: April 5, 2023</div>
+                    <p>Early access to upcoming features. Note that beta versions may contain bugs and are not recommended for regular play.</p>
+                    <div class="beta-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Beta versions may be unstable and are for testing purposes only.
+                    </div>
+                    <ul class="version-features">
+                        <li>Advanced shader support (experimental)</li>
+                        <li>Custom player models</li>
+                        <li>Enhanced minimap system</li>
+                        <li>Voice chat integration (early implementation)</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    {% if current_user.is_authenticated %}
+                        <a href="#" class="minecraft-btn secondary w-100 download-btn" data-version="CleanCatClient-v1.2.0-beta">
+                            Download Beta
+                        </a>
+                    {% else %}
+                        <div class="text-center w-100">
+                            <p>Please <a href="{{ url_for('login') }}">login</a> to access beta versions.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Download Progress -->
+        <div id="download-progress" class="download-progress">
+            <h3 class="mb-3">Download in Progress</h3>
+            <div class="minecraft-progress">
+                <div id="progress-bar" class="minecraft-progress-bar" style="width: 0%"></div>
+            </div>
+            <p id="download-status">Preparing download...</p>
+        </div>
+        
+        <!-- Download Mirrors -->
+        <div class="download-options">
+            <h3 class="mb-4">Download Mirrors</h3>
+            <p>Choose a download server closest to your location for faster downloads:</p>
+            
+            <div class="mirror-option" style="border-color: var(--gold); background-color: rgba(60, 60, 60, 0.8);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Primary Server (US)</h5>
+                        <p class="mb-0 text-muted">Recommended for users in North America</p>
+                    </div>
+                    <div class="text-success">
+                        <i class="fas fa-check-circle me-1"></i> Selected
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mirror-option">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">European Server</h5>
+                        <p class="mb-0 text-muted">Recommended for users in Europe</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Fast</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mirror-option">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Asia-Pacific Server</h5>
+                        <p class="mb-0 text-muted">Recommended for users in Asia and Oceania</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Fast</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mirror-option">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Alternative Mirror</h5>
+                        <p class="mb-0 text-muted">Use this if other servers are unavailable</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-warning text-dark">Slower</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Requirements -->
+        <div class="system-requirements">
+            <h3 class="mb-4">System Requirements</h3>
+            <div class="table-responsive">
+                <table class="req-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Minimum</th>
+                            <th>Recommended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating System</strong></td>
+                            <td>Windows 7, macOS 10.13, Linux</td>
+                            <td>Windows 10+, macOS 10.15+, Ubuntu 20.04+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Processor</strong></td>
+                            <td>Intel Core i3 / AMD Ryzen 3</td>
+                            <td>Intel Core i5 / AMD Ryzen 5 or better</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory</strong></td>
+                            <td>4 GB RAM</td>
+                            <td>8 GB RAM or more</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Graphics</strong></td>
+                            <td>Integrated Graphics with OpenGL 4.1</td>
+                            <td>Dedicated GPU with 2GB+ VRAM</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Storage</strong></td>
+                            <td>500 MB available space</td>
+                            <td>1 GB+ available space</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Java</strong></td>
+                            <td>Java 8</td>
+                            <td>Java 16 or newer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Minecraft</strong></td>
+                            <td>Minecraft 1.18.x</td>
+                            <td>Minecraft 1.19.x</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Installation Steps -->
+        <div class="installation-steps">
+            <h3 class="mb-4">Installation Guide</h3>
+            
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div>
+                    <h5>Download the Client</h5>
+                    <p>Select your desired version from the options above and download the installer for your operating system.</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div>
+                    <h5>Run the Installer</h5>
+                    <p>Double-click the downloaded file to start the installation process. Follow the on-screen instructions.</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div>
+                    <h5>Launch Minecraft</h5>
+                    <p>Open the Minecraft Launcher. CleanCatClient will appear as a new profile in your launcher's profile list.</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div>
+                    <h5>Select CleanCatClient Profile</h5>
+                    <p>Choose the CleanCatClient profile from the dropdown menu and click "Play" to start Minecraft with CleanCatClient.</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">5</div>
+                <div>
+                    <h5>Configure Settings</h5>
+                    <p>Once in-game, press the 'Right Shift' key to open the CleanCatClient settings menu and customize your experience.</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="#" class="minecraft-btn secondary">View Full Installation Guide</a>
+            </div>
+        </div>
+        
+        <!-- FAQ -->
+        <div class="minecraft-panel mb-5">
+            <h3 class="mb-4">Frequently Asked Questions</h3>
+            
+            <div class="mb-4">
+                <h5>Is CleanCatClient compatible with other mods?</h5>
+                <p>Yes, CleanCatClient is designed to be compatible with most popular Minecraft mods. However, some mods may conflict with certain features. Check our compatibility list for details.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>Will CleanCatClient work with multiplayer servers?</h5>
+                <p>CleanCatClient is designed to be compatible with most vanilla and modded servers. However, some servers may have anti-cheat systems that could flag certain features. We recommend checking server rules before using all features.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>Is CleanCatClient safe to use?</h5>
+                <p>Absolutely! CleanCatClient is malware-free and safe to use. Our code is regularly audited for security vulnerabilities, and we take user privacy very seriously.</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5>How do I update to a newer version?</h5>
+                <p>Simply download the latest version and run the installer. It will automatically update your existing installation while preserving your settings.</p>
+            </div>
+            
+            <div>
+                <h5>I'm having technical issues. Where can I get help?</h5>
+                <p>Visit our <a href="#">Support Forum</a> or join our <a href="#">Discord server</a> for technical assistance. You can also create a support ticket from your <a href="{{ url_for('profile') }}">profile page</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

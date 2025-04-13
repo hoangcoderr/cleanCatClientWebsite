@@ -1,0 +1,645 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .checkout-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    
+    .cart-items-container {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .cart-item {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--gold);
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .cart-item:hover {
+        background-color: rgba(50, 50, 50, 0.8);
+    }
+    
+    .cart-item-img {
+        width: 80px;
+        height: 80px;
+        background-color: var(--grass-green);
+    }
+    
+    .checkout-summary {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--gold);
+        padding: 20px;
+        position: sticky;
+        top: 100px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    }
+    
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+    
+    .summary-total {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--gold);
+        padding-top: 15px;
+        margin-top: 15px;
+        border-top: 2px solid var(--gold);
+    }
+    
+    .payment-method {
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: rgba(40, 40, 40, 0.8);
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .payment-method:hover, .payment-method.selected {
+        border-color: var(--gold);
+        background-color: rgba(60, 60, 60, 0.8);
+    }
+    
+    .payment-method.selected .payment-radio {
+        background-color: var(--gold);
+    }
+    
+    .payment-radio {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--gold);
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 10px;
+        position: relative;
+    }
+    
+    .minecraft-input {
+        margin-bottom: 15px;
+    }
+    
+    .promo-code-container {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .promo-code-input {
+        flex-grow: 1;
+        margin-bottom: 0;
+        margin-right: 10px;
+    }
+    
+    .quantity-control {
+        display: flex;
+        align-items: center;
+    }
+    
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        background-color: var(--dirt-brown);
+        border: 2px solid black;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .quantity-btn:hover {
+        background-color: var(--gold);
+    }
+    
+    .quantity-input {
+        width: 40px;
+        height: 30px;
+        text-align: center;
+        margin: 0 5px;
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 2px solid black;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize checkout
+        initCheckout();
+        
+        // Payment method selection
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Show/hide appropriate payment details
+                const paymentType = this.dataset.payment;
+                document.querySelectorAll('.payment-details').forEach(detail => {
+                    detail.style.display = 'none';
+                });
+                
+                const selectedDetail = document.querySelector(`.payment-details[data-payment="${paymentType}"]`);
+                if (selectedDetail) {
+                    selectedDetail.style.display = 'block';
+                }
+            });
+        });
+        
+        // Promo code application
+        const applyPromoBtn = document.getElementById('apply-promo');
+        if (applyPromoBtn) {
+            applyPromoBtn.addEventListener('click', applyPromoCode);
+        }
+        
+        // Quantity buttons
+        const decreaseBtns = document.querySelectorAll('.decrease-quantity');
+        const increaseBtns = document.querySelectorAll('.increase-quantity');
+        
+        decreaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.nextElementSibling;
+                let value = parseInt(input.value);
+                if (value > 1) {
+                    input.value = value - 1;
+                    updateItemTotal(this.closest('.cart-item'), input.value);
+                }
+            });
+        });
+        
+        increaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                let value = parseInt(input.value);
+                input.value = value + 1;
+                updateItemTotal(this.closest('.cart-item'), input.value);
+            });
+        });
+        
+        // Checkout form submission
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processOrder();
+            });
+        }
+    });
+    
+    function initCheckout() {
+        // Load cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        // Check if cart is empty
+        if (cart.length === 0) {
+            showEmptyCart();
+            return;
+        }
+        
+        // Render cart items
+        const cartContainer = document.getElementById('cart-items');
+        if (!cartContainer) return;
+        
+        // Clear existing content
+        cartContainer.innerHTML = '';
+        
+        // Calculate totals
+        let subtotal = 0;
+        
+        // Add each item
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            
+            const itemElement = createCartItemElement(item);
+            cartContainer.appendChild(itemElement);
+        });
+        
+        // Update summary
+        updateOrderSummary(subtotal);
+    }
+    
+    function createCartItemElement(item) {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item mb-3';
+        itemElement.dataset.productId = item.id;
+        itemElement.dataset.productPrice = item.price;
+        
+        const itemTotal = item.price * item.quantity;
+        
+        itemElement.innerHTML = `
+            <div class="row align-items-center">
+                <div class="col-md-2 col-3 mb-2 mb-md-0">
+                    <div class="cart-item-img pixelated" style="background-color: #5D8544;"></div>
+                </div>
+                <div class="col-md-4 col-9 mb-2 mb-md-0">
+                    <h5>${item.name}</h5>
+                    <div class="text-muted">$${item.price.toFixed(2)} each</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="quantity-control">
+                        <div class="quantity-btn decrease-quantity">-</div>
+                        <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+                        <div class="quantity-btn increase-quantity">+</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4 text-end">
+                    <div class="item-total">$${itemTotal.toFixed(2)}</div>
+                </div>
+                <div class="col-md-1 col-2 text-end">
+                    <button class="btn btn-sm btn-danger remove-item" data-product-id="${item.id}">×</button>
+                </div>
+            </div>
+        `;
+        
+        // Add event listener to remove button
+        const removeBtn = itemElement.querySelector('.remove-item');
+        removeBtn.addEventListener('click', function() {
+            removeCartItem(item.id);
+        });
+        
+        return itemElement;
+    }
+    
+    function updateItemTotal(itemElement, quantity) {
+        const price = parseFloat(itemElement.dataset.productPrice);
+        const totalElement = itemElement.querySelector('.item-total');
+        const total = price * quantity;
+        
+        totalElement.textContent = '$' + total.toFixed(2);
+        
+        // Update cart in localStorage
+        const productId = itemElement.dataset.productId;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        const item = cart.find(item => item.id === productId);
+        if (item) {
+            item.quantity = quantity;
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+        
+        // Recalculate order summary
+        recalculateTotal();
+    }
+    
+    function removeCartItem(productId) {
+        // Remove from DOM
+        const itemElement = document.querySelector(`.cart-item[data-product-id="${productId}"]`);
+        if (itemElement) {
+            itemElement.remove();
+        }
+        
+        // Update localStorage
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.id !== productId);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
+        // Update cart count
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        cartCountElements.forEach(element => {
+            element.textContent = cart.length;
+        });
+        
+        // Show empty cart message if needed
+        if (cart.length === 0) {
+            showEmptyCart();
+        } else {
+            // Recalculate totals
+            recalculateTotal();
+        }
+    }
+    
+    function recalculateTotal() {
+        const cartItems = document.querySelectorAll('.cart-item');
+        let subtotal = 0;
+        
+        cartItems.forEach(item => {
+            const price = parseFloat(item.dataset.productPrice);
+            const quantity = parseInt(item.querySelector('.quantity-input').value);
+            subtotal += price * quantity;
+        });
+        
+        updateOrderSummary(subtotal);
+    }
+    
+    function updateOrderSummary(subtotal) {
+        const subtotalElement = document.getElementById('order-subtotal');
+        const taxElement = document.getElementById('order-tax');
+        const totalElement = document.getElementById('order-total');
+        
+        if (!subtotalElement || !taxElement || !totalElement) return;
+        
+        // Calculate values
+        const tax = subtotal * 0.08; // 8% tax
+        const total = subtotal + tax;
+        
+        // Update display
+        subtotalElement.textContent = '$' + subtotal.toFixed(2);
+        taxElement.textContent = '$' + tax.toFixed(2);
+        totalElement.textContent = '$' + total.toFixed(2);
+    }
+    
+    function showEmptyCart() {
+        const cartContainer = document.getElementById('cart-items');
+        const checkoutForm = document.getElementById('checkout-form');
+        
+        if (cartContainer) {
+            cartContainer.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-4x mb-3" style="color: var(--dirt-brown);"></i>
+                    <h3>Your cart is empty</h3>
+                    <p class="mb-4">Looks like you haven't added any items to your cart yet.</p>
+                    <a href="{{ url_for('store') }}" class="minecraft-btn primary">Go to Store</a>
+                </div>
+            `;
+        }
+        
+        if (checkoutForm) {
+            checkoutForm.style.display = 'none';
+        }
+    }
+    
+    function applyPromoCode() {
+        const promoInput = document.getElementById('promo-code');
+        const promoCode = promoInput.value.trim();
+        
+        if (!promoCode) {
+            showPromoMessage('Please enter a promo code', 'danger');
+            return;
+        }
+        
+        // In a real app, this would validate against the server
+        // For now, we'll simulate with some sample codes
+        if (promoCode.toUpperCase() === 'WELCOME10') {
+            applyDiscount(0.1, 'Welcome discount (10%)');
+            showPromoMessage('Promo code applied successfully!', 'success');
+        } else if (promoCode.toUpperCase() === 'MINECRAFT20') {
+            applyDiscount(0.2, 'Special discount (20%)');
+            showPromoMessage('Promo code applied successfully!', 'success');
+        } else {
+            showPromoMessage('Invalid promo code', 'danger');
+        }
+    }
+    
+    function applyDiscount(rate, description) {
+        // Get current subtotal
+        const subtotalElement = document.getElementById('order-subtotal');
+        const subtotal = parseFloat(subtotalElement.textContent.replace('$', ''));
+        
+        // Calculate discount
+        const discount = subtotal * rate;
+        
+        // Add discount row if it doesn't exist
+        let discountRow = document.getElementById('discount-row');
+        if (!discountRow) {
+            const summaryContainer = document.querySelector('.summary-container');
+            discountRow = document.createElement('div');
+            discountRow.id = 'discount-row';
+            discountRow.className = 'summary-row text-success';
+            summaryContainer.insertBefore(discountRow, document.getElementById('total-row'));
+        }
+        
+        // Update discount display
+        discountRow.innerHTML = `
+            <div>${description}</div>
+            <div>-$${discount.toFixed(2)}</div>
+        `;
+        
+        // Recalculate total
+        recalculateTotal();
+    }
+    
+    function showPromoMessage(message, type) {
+        const promoMessage = document.getElementById('promo-message');
+        
+        if (promoMessage) {
+            promoMessage.textContent = message;
+            promoMessage.className = `text-${type} small mt-2`;
+            
+            // Hide after a few seconds
+            setTimeout(() => {
+                promoMessage.textContent = '';
+            }, 3000);
+        }
+    }
+    
+    function processOrder() {
+        // In a real app, this would submit to the server
+        // For now, just show success and clear cart
+        
+        // Show processing
+        const checkoutBtn = document.querySelector('#checkout-form button[type="submit"]');
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        // Simulate processing delay
+        setTimeout(() => {
+            // Clear cart
+            localStorage.removeItem('cart');
+            
+            // Show success message
+            const checkoutContainer = document.querySelector('.checkout-container');
+            checkoutContainer.innerHTML = `
+                <div class="minecraft-panel text-center py-5">
+                    <i class="fas fa-check-circle fa-5x mb-4" style="color: var(--grass-green);"></i>
+                    <h2 class="minecraft-title emerald mb-4">Order Successful!</h2>
+                    <p class="mb-4">Thank you for your purchase. Your order has been processed successfully.</p>
+                    <p class="mb-4">You will receive a confirmation email shortly with your order details.</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('profile') }}" class="minecraft-btn primary me-3">View Order History</a>
+                        <a href="{{ url_for('download') }}" class="minecraft-btn secondary">Go to Downloads</a>
+                    </div>
+                </div>
+            `;
+            
+            // Update cart count
+            const cartCountElements = document.querySelectorAll('.cart-count');
+            cartCountElements.forEach(element => {
+                element.textContent = '0';
+            });
+        }, 2000);
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="minecraft-title diamond text-center mb-5">Checkout</h1>
+    
+    <div class="checkout-container">
+        <div class="row">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <!-- Cart Items -->
+                <div class="cart-items-container">
+                    <h3 class="mb-4">Your Cart</h3>
+                    <div id="cart-items">
+                        <!-- Cart items will be populated by JavaScript -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                            <h4>Loading your cart...</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Checkout Form -->
+                <div id="checkout-form" class="minecraft-panel">
+                    <h3 class="mb-4">Payment Information</h3>
+                    
+                    <div class="mb-4">
+                        <div class="payment-method selected" data-payment="card">
+                            <span class="payment-radio"></span>
+                            <i class="far fa-credit-card me-2"></i>
+                            Credit / Debit Card
+                        </div>
+                        <div class="payment-method" data-payment="paypal">
+                            <span class="payment-radio"></span>
+                            <i class="fab fa-paypal me-2"></i>
+                            PayPal
+                        </div>
+                        <div class="payment-method" data-payment="crypto">
+                            <span class="payment-radio"></span>
+                            <i class="fab fa-bitcoin me-2"></i>
+                            Cryptocurrency
+                        </div>
+                    </div>
+                    
+                    <!-- Credit Card Details -->
+                    <div class="payment-details" data-payment="card">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Card Number</label>
+                                <input type="text" class="minecraft-input form-control" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Expiration Date</label>
+                                <input type="text" class="minecraft-input form-control" placeholder="MM/YY">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">CVV</label>
+                                <input type="text" class="minecraft-input form-control" placeholder="123">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Cardholder Name</label>
+                                <input type="text" class="minecraft-input form-control" placeholder="John Doe">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PayPal Details -->
+                    <div class="payment-details" data-payment="paypal" style="display: none;">
+                        <p class="mb-4">You will be redirected to PayPal to complete your payment.</p>
+                    </div>
+                    
+                    <!-- Crypto Details -->
+                    <div class="payment-details" data-payment="crypto" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Select Cryptocurrency</label>
+                            <select class="minecraft-input form-control">
+                                <option value="btc">Bitcoin (BTC)</option>
+                                <option value="eth">Ethereum (ETH)</option>
+                                <option value="ltc">Litecoin (LTC)</option>
+                            </select>
+                        </div>
+                        <p>After submitting your order, you will receive payment instructions.</p>
+                    </div>
+                    
+                    <h3 class="mb-4 mt-5">Billing Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="John">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="Doe">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="minecraft-input form-control" placeholder="john@example.com">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="1234 Main St">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="City">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">State</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="State">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Zip</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="12345">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="minecraft-btn primary w-100">Complete Order</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Order Summary -->
+                <div class="checkout-summary">
+                    <h3 class="mb-4">Order Summary</h3>
+                    
+                    <div class="summary-container">
+                        <div class="summary-row">
+                            <div>Subtotal</div>
+                            <div id="order-subtotal">$0.00</div>
+                        </div>
+                        <div class="summary-row">
+                            <div>Tax (8%)</div>
+                            <div id="order-tax">$0.00</div>
+                        </div>
+                        <div class="summary-row summary-total" id="total-row">
+                            <div>Total</div>
+                            <div id="order-total">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Promo Code -->
+                    <div class="mt-4">
+                        <h5>Promo Code</h5>
+                        <div class="promo-code-container">
+                            <input type="text" id="promo-code" class="minecraft-input promo-code-input" placeholder="Enter code">
+                            <button id="apply-promo" class="minecraft-btn secondary">Apply</button>
+                        </div>
+                        <div id="promo-message"></div>
+                    </div>
+                    
+                    <!-- Secure Checkout Message -->
+                    <div class="mt-4 text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="fas fa-lock me-2"></i>
+                            <span>Secure Checkout</span>
+                        </div>
+                        <small class="text-muted">Your payment information is securely processed and never stored on our servers.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

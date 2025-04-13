@@ -1,0 +1,283 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .product-card {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .product-highlight {
+        transform: translateY(-10px);
+    }
+    
+    .product-content {
+        padding: 20px;
+    }
+    
+    .price-tag {
+        background-color: var(--gold);
+        color: black;
+        display: inline-block;
+        padding: 5px 10px;
+        font-family: var(--pixel-font);
+        font-weight: bold;
+        font-size: 1.2rem;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 2;
+        transform: rotate(5deg);
+        box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+    
+    .category-filters {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-btn {
+        border: 2px solid transparent;
+        background: none;
+        color: white;
+        padding: 8px 15px;
+        margin-right: 10px;
+        font-family: var(--pixel-font);
+        transition: all 0.3s;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+        color: var(--gold);
+        border-bottom: 2px solid var(--gold);
+    }
+    
+    .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 350px;
+        height: 100vh;
+        background-color: rgba(20, 20, 20, 0.95);
+        border-left: 5px solid var(--dirt-brown);
+        z-index: 1000;
+        padding: 20px;
+        overflow-y: auto;
+        transition: right 0.3s ease-out;
+    }
+    
+    .cart-sidebar.open {
+        right: 0;
+    }
+    
+    .cart-item {
+        background-color: rgba(30, 30, 30, 0.8);
+    }
+    
+    .pulse-animation {
+        animation: pulse 0.5s;
+    }
+    
+    .flash-animation {
+        animation: flash 0.3s;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes flash {
+        0% { background-color: rgba(255, 215, 0, 0.7); }
+        100% { background-color: transparent; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="minecraft-title diamond text-center mb-5">CleanCatClient Store</h1>
+    
+    <!-- Category Filters -->
+    <div class="category-filters mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <button class="filter-btn active" data-filter="all">All Items</button>
+                <button class="filter-btn" data-filter="package">Packages</button>
+                <button class="filter-btn" data-filter="cosmetic">Cosmetics</button>
+                <button class="filter-btn" data-filter="feature">Features</button>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <select id="sort-products" class="minecraft-input">
+                    <option value="featured">Featured</option>
+                    <option value="price-low-high">Price: Low to High</option>
+                    <option value="price-high-low">Price: High to Low</option>
+                    <option value="name-a-z">Name: A to Z</option>
+                    <option value="name-z-a">Name: Z to A</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="row products-container">
+        {% for product in products %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="package" data-price="{{ product.price }}" data-name="{{ product.name }}">
+                <div class="price-tag">${{ product.price }}</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1647538722287-8abc5e9240db'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="{{ product.id }}" 
+                                data-product-name="{{ product.name }}" 
+                                data-product-price="{{ product.price }}" 
+                                data-product-image="product1.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Additional Products (static for the template) -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="cosmetic" data-price="4.99" data-name="Animated Capes Pack">
+                <div class="price-tag">$4.99</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1524685794168-52985e79c1f8'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>Animated Capes Pack</h3>
+                    <p>A collection of 10 animated capes to make your character stand out in multiplayer.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="4" 
+                                data-product-name="Animated Capes Pack" 
+                                data-product-price="4.99" 
+                                data-product-image="capes.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="feature" data-price="7.99" data-name="Advanced HUD Pack">
+                <div class="price-tag">$7.99</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1648830779899-45dcc4cc6ea6'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>Advanced HUD Pack</h3>
+                    <p>Customize your game interface with advanced HUD elements, status displays, and minimap features.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="5" 
+                                data-product-name="Advanced HUD Pack" 
+                                data-product-price="7.99" 
+                                data-product-image="hud.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="package" data-price="39.99" data-name="Lifetime Package">
+                <div class="price-tag">$39.99</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1613645695025-20e3f38de4a6'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>Lifetime Package</h3>
+                    <p>Get lifetime access to all current and future features of CleanCatClient. Best value!</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="6" 
+                                data-product-name="Lifetime Package" 
+                                data-product-price="39.99" 
+                                data-product-image="lifetime.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="cosmetic" data-price="3.99" data-name="Custom Particles Pack">
+                <div class="price-tag">$3.99</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1664363243728-bc95cb65cfa4'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>Custom Particles Pack</h3>
+                    <p>Add spectacular particle effects to your character's movements and actions.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="7" 
+                                data-product-name="Custom Particles Pack" 
+                                data-product-price="3.99" 
+                                data-product-image="particles.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="product-card h-100" data-category="feature" data-price="5.99" data-name="Performance Optimizer">
+                <div class="price-tag">$5.99</div>
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1638444571531-42e04914a830'); height: 200px;"></div>
+                <div class="product-content">
+                    <h3>Performance Optimizer</h3>
+                    <p>Advanced optimization tools to boost your FPS and reduce lag even further.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button class="minecraft-btn primary add-to-cart-btn" 
+                                data-product-id="8" 
+                                data-product-name="Performance Optimizer" 
+                                data-product-price="5.99" 
+                                data-product-image="performance.jpg">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="btn btn-link text-info">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bundle Offer -->
+    <div class="minecraft-panel mt-5">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3 class="minecraft-title gold mb-3">Special Bundle Offer</h3>
+                <p>Get all premium features, cosmetics, and future updates at a discounted price with our Ultimate Bundle!</p>
+                <ul class="mb-4">
+                    <li>Access to all premium features</li>
+                    <li>All cosmetic packs included</li>
+                    <li>Priority support</li>
+                    <li>Early access to beta features</li>
+                    <li>Free future updates</li>
+                </ul>
+                <h4 class="mb-3"><s class="text-muted">$59.99</s> <span class="text-success">$49.99</span> <span class="badge bg-danger">SAVE 16%</span></h4>
+            </div>
+            <div class="col-md-4 text-center">
+                <button class="minecraft-btn gold add-to-cart-btn" 
+                        data-product-id="9" 
+                        data-product-name="Ultimate Bundle" 
+                        data-product-price="49.99" 
+                        data-product-image="bundle.jpg">
+                    Add Bundle to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

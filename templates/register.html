@@ -1,0 +1,126 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 60px auto;
+    }
+    
+    .register-header {
+        position: relative;
+        padding: 20px;
+        background-color: var(--grass-green);
+        color: white;
+        text-align: center;
+        border: 4px solid black;
+        border-bottom: none;
+    }
+    
+    .register-body {
+        background-color: rgba(30, 30, 30, 0.9);
+        border: 4px solid black;
+        padding: 30px;
+    }
+    
+    .password-strength-container {
+        height: 10px;
+        background-color: #333;
+        margin-top: 10px;
+        border: 2px solid black;
+    }
+    
+    .password-strength-meter {
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s, background-color 0.3s;
+    }
+    
+    .shake-animation {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+    }
+    
+    .minecraft-checkbox {
+        margin-bottom: 20px;
+    }
+    
+    .auth-btn {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="register-container">
+        <div class="register-header">
+            <h2 class="mb-0">Create an Account</h2>
+        </div>
+        <div class="register-body">
+            <form id="register-form" method="post" action="{{ url_for('register') }}">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="minecraft-input form-control" id="username" name="username" placeholder="Choose a username">
+                    <small id="username-availability" class="form-text"></small>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="minecraft-input form-control" id="email" name="email" placeholder="Enter your email">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="minecraft-input form-control" id="password" name="password" placeholder="Create a password">
+                    <div class="password-strength-container">
+                        <div id="password-strength" class="password-strength-meter"></div>
+                    </div>
+                    <small class="form-text text-muted">Password must be at least 8 characters long</small>
+                </div>
+                <div class="mb-4">
+                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" class="minecraft-input form-control" id="confirm-password" name="confirm-password" placeholder="Confirm your password">
+                </div>
+                <div class="mb-4">
+                    <label class="minecraft-checkbox">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        <input type="checkbox" name="terms" required>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="minecraft-btn primary auth-btn">Register</button>
+                </div>
+                <div class="text-center mt-4">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </form>
+            
+            <div class="mt-5">
+                <p class="text-center mb-3">Or register with:</p>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="minecraft-btn w-100 mb-3" style="background-color: #7289DA;">
+                            <i class="fab fa-discord me-2"></i> Discord
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="minecraft-btn w-100 mb-3" style="background-color: #24292e;">
+                            <i class="fab fa-github me-2"></i> GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

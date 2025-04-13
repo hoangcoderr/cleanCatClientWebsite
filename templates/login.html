@@ -1,0 +1,96 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 60px auto;
+    }
+    
+    .login-header {
+        position: relative;
+        padding: 20px;
+        background-color: var(--dirt-brown);
+        color: white;
+        text-align: center;
+        border: 4px solid black;
+        border-bottom: none;
+    }
+    
+    .login-body {
+        background-color: rgba(30, 30, 30, 0.9);
+        border: 4px solid black;
+        padding: 30px;
+    }
+    
+    .shake-animation {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+    }
+    
+    .auth-btn {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <h2 class="mb-0">Login to CleanCatClient</h2>
+        </div>
+        <div class="login-body">
+            <form id="login-form" method="post" action="{{ url_for('login') }}">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="minecraft-input form-control" id="username" name="username" placeholder="Enter your username">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="minecraft-input form-control" id="password" name="password" placeholder="Enter your password">
+                </div>
+                <div class="mb-4 form-check">
+                    <label class="minecraft-checkbox">
+                        Remember me
+                        <input type="checkbox" name="remember">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="minecraft-btn primary auth-btn">Login</button>
+                </div>
+                <div class="text-center mt-4">
+                    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                    <p><a href="#">Forgot your password?</a></p>
+                </div>
+            </form>
+            
+            <div class="mt-5">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="minecraft-btn w-100 mb-3" style="background-color: #7289DA;">
+                            <i class="fab fa-discord me-2"></i> Discord
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="minecraft-btn w-100 mb-3" style="background-color: #24292e;">
+                            <i class="fab fa-github me-2"></i> GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

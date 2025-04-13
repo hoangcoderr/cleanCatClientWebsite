@@ -1,0 +1,898 @@
+{% extends 'layout.html' %}
+
+{% block additional_css %}
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .profile-header {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 10px;
+        background-color: var(--gold);
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border: 5px solid var(--dirt-brown);
+        background-color: var(--stone-gray);
+        position: relative;
+    }
+    
+    .edit-avatar {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        background-color: var(--gold);
+        border: 2px solid black;
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .profile-stats {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+    
+    .stat-item {
+        flex: 1 1 auto;
+        min-width: 120px;
+        text-align: center;
+        padding: 15px;
+        background-color: rgba(40, 40, 40, 0.8);
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border: 2px solid var(--stone-gray);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        color: var(--gold);
+        font-family: var(--pixel-font);
+    }
+    
+    .stat-label {
+        color: #aaa;
+        font-size: 0.9rem;
+    }
+    
+    .profile-nav {
+        background-color: rgba(30, 30, 30, 0.8);
+        border-bottom: 3px solid var(--dirt-brown);
+        margin-bottom: 30px;
+    }
+    
+    .profile-nav-item {
+        display: inline-block;
+        padding: 15px 20px;
+        color: white;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -3px;
+        transition: all 0.3s;
+    }
+    
+    .profile-nav-item:hover, .profile-nav-item.active {
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+    }
+    
+    .profile-content {
+        background-color: rgba(30, 30, 30, 0.8);
+        border: 3px solid var(--dirt-brown);
+        padding: 30px;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .achievement {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--diamond-blue);
+        padding: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .achievement-icon {
+        width: 50px;
+        height: 50px;
+        background-color: var(--diamond-blue);
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .achievement-locked {
+        border-left-color: var(--stone-gray);
+        opacity: 0.7;
+    }
+    
+    .achievement-locked .achievement-icon {
+        background-color: var(--stone-gray);
+    }
+    
+    .order-card {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--gold);
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    
+    .order-card:hover {
+        transform: translateX(5px);
+    }
+    
+    .order-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .order-id {
+        color: var(--gold);
+        font-family: var(--pixel-font);
+    }
+    
+    .order-body {
+        padding: 15px;
+    }
+    
+    .order-items {
+        margin-bottom: 15px;
+    }
+    
+    .order-item {
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    }
+    
+    .order-total {
+        text-align: right;
+        font-size: 1.1rem;
+        color: var(--gold);
+    }
+    
+    .profile-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .settings-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    }
+    
+    .settings-option:last-child {
+        border-bottom: none;
+    }
+    
+    .support-ticket {
+        background-color: rgba(40, 40, 40, 0.8);
+        border-left: 4px solid var(--grass-green);
+        margin-bottom: 15px;
+        padding: 15px;
+    }
+    
+    .ticket-status {
+        display: inline-block;
+        padding: 3px 10px;
+        font-size: 0.8rem;
+        border-radius: 0;
+    }
+    
+    .status-open {
+        background-color: var(--grass-green);
+        color: white;
+    }
+    
+    .status-closed {
+        background-color: var(--redstone-red);
+        color: white;
+    }
+    
+    .status-pending {
+        background-color: var(--gold);
+        color: black;
+    }
+    
+    /* Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: .4s;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: var(--grass-green);
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab navigation
+        const navItems = document.querySelectorAll('.profile-nav-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all tabs
+                navItems.forEach(nav => nav.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to current tab
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update URL hash
+                window.location.hash = tabId;
+            });
+        });
+        
+        // Check for hash in URL
+        const hash = window.location.hash.substring(1);
+        if (hash && document.getElementById(hash)) {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${hash}"]`).classList.add('active');
+            document.getElementById(hash).classList.add('active');
+        }
+        
+        // Profile form validation
+        const profileForm = document.getElementById('profile-form');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate saving
+                const saveBtn = this.querySelector('button[type="submit"]');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                setTimeout(() => {
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    
+                    setTimeout(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = originalText;
+                    }, 2000);
+                }, 1500);
+            });
+        }
+        
+        // Change password form
+        const passwordForm = document.getElementById('password-form');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Basic validation
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showPasswordMessage('All fields are required', 'danger');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showPasswordMessage('New passwords do not match', 'danger');
+                    return;
+                }
+                
+                // Simulate changing password
+                const saveBtn = this.querySelector('button[type="submit"]');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                
+                setTimeout(() => {
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Updated!';
+                    showPasswordMessage('Password successfully changed', 'success');
+                    
+                    // Clear form
+                    this.reset();
+                    
+                    setTimeout(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = originalText;
+                    }, 2000);
+                }, 1500);
+            });
+        }
+    });
+    
+    function showPasswordMessage(message, type) {
+        const messageElement = document.getElementById('password-message');
+        if (messageElement) {
+            messageElement.textContent = message;
+            messageElement.className = `alert alert-${type} mt-3`;
+            
+            // Hide after a few seconds
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header mb-4">
+            <div class="row">
+                <div class="col-md-2 col-4 mb-3 mb-md-0">
+                    <div class="profile-avatar">
+                        <img src="https://images.unsplash.com/photo-1634580285846-374f22b48c7d" alt="Profile Avatar" class="img-fluid pixelated">
+                        <div class="edit-avatar">
+                            <i class="fas fa-pen"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-10 col-8">
+                    <h2>{{ current_user.username }}</h2>
+                    <p class="text-muted">Member since {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-2">Premium User</span>
+                        <span class="badge bg-primary me-2">Verified</span>
+                        {% if current_user.is_admin %}
+                            <span class="badge bg-danger">Administrator</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Purchases</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">7</div>
+                            <div class="stat-label">Downloads</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Achievements</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">Support Tickets</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Navigation -->
+        <div class="profile-nav mb-4">
+            <div class="profile-nav-item active" data-tab="tab-overview">Overview</div>
+            <div class="profile-nav-item" data-tab="tab-purchases">Purchases</div>
+            <div class="profile-nav-item" data-tab="tab-achievements">Achievements</div>
+            <div class="profile-nav-item" data-tab="tab-settings">Settings</div>
+            <div class="profile-nav-item" data-tab="tab-support">Support</div>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Overview Tab -->
+            <div id="tab-overview" class="tab-content active">
+                <h3 class="mb-4">Account Overview</h3>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="minecraft-panel h-100">
+                            <h4>Recent Activity</h4>
+                            <div class="list-group">
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Purchased Premium Package</h5>
+                                        <small>3 days ago</small>
+                                    </div>
+                                    <p class="mb-1">You purchased the Premium Package for $19.99</p>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Downloaded v1.1.0</h5>
+                                        <small>5 days ago</small>
+                                    </div>
+                                    <p class="mb-1">You downloaded CleanCatClient version 1.1.0</p>
+                                </div>
+                                <div class="list-group-item bg-transparent text-white border-0 ps-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Achievement Unlocked</h5>
+                                        <small>1 week ago</small>
+                                    </div>
+                                    <p class="mb-1">You earned the "Early Adopter" achievement</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="minecraft-panel h-100">
+                            <h4>Account Information</h4>
+                            <table class="table table-dark table-transparent">
+                                <tbody>
+                                    <tr>
+                                        <td>Username</td>
+                                        <td>{{ current_user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email</td>
+                                        <td>{{ current_user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Account Type</td>
+                                        <td>Premium</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Subscription</td>
+                                        <td>Active (Renews on Jan 15, 2024)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="minecraft-btn secondary btn-sm mt-2">Edit Details</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="minecraft-panel">
+                            <h4>Your Downloads</h4>
+                            <div class="table-responsive">
+                                <table class="table table-dark table-transparent">
+                                    <thead>
+                                        <tr>
+                                            <th>Version</th>
+                                            <th>Download Date</th>
+                                            <th>Size</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CleanCatClient v1.1.0</td>
+                                            <td>March 11, 2023</td>
+                                            <td>85 MB</td>
+                                            <td>
+                                                <a href="{{ url_for('download') }}" class="btn btn-sm btn-primary">Download Again</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>CleanCatClient v1.0.1</td>
+                                            <td>February 2, 2023</td>
+                                            <td>78 MB</td>
+                                            <td>
+                                                <a href="{{ url_for('download') }}" class="btn btn-sm btn-primary">Download Again</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>CleanCatClient v1.0.0</td>
+                                            <td>January 16, 2023</td>
+                                            <td>75 MB</td>
+                                            <td>
+                                                <a href="{{ url_for('download') }}" class="btn btn-sm btn-primary">Download Again</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Purchases Tab -->
+            <div id="tab-purchases" class="tab-content">
+                <h3 class="mb-4">Your Purchases</h3>
+                
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">Order #CC-1087</div>
+                        <div class="order-date">March 8, 2023</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">
+                            <div class="order-item d-flex justify-content-between">
+                                <div>Premium Package</div>
+                                <div>$19.99</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-success">Completed</span>
+                            </div>
+                            <div class="order-total">Total: $19.99</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">Order #CC-954</div>
+                        <div class="order-date">February 22, 2023</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">
+                            <div class="order-item d-flex justify-content-between">
+                                <div>Animated Capes Pack</div>
+                                <div>$4.99</div>
+                            </div>
+                            <div class="order-item d-flex justify-content-between">
+                                <div>Advanced HUD Pack</div>
+                                <div>$7.99</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-success">Completed</span>
+                            </div>
+                            <div class="order-total">Total: $12.98</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">Order #CC-843</div>
+                        <div class="order-date">January 30, 2023</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">
+                            <div class="order-item d-flex justify-content-between">
+                                <div>Basic Package</div>
+                                <div>$9.99</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-success">Completed</span>
+                            </div>
+                            <div class="order-total">Total: $9.99</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('store') }}" class="minecraft-btn primary">Visit Store</a>
+                </div>
+            </div>
+            
+            <!-- Achievements Tab -->
+            <div id="tab-achievements" class="tab-content">
+                <h3 class="mb-4">Your Achievements</h3>
+                
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div>
+                        <h5>Premium Supporter</h5>
+                        <p class="mb-0">Purchased any premium package</p>
+                    </div>
+                </div>
+                
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <h5>Early Adopter</h5>
+                        <p class="mb-0">Joined during the first month of launch</p>
+                    </div>
+                </div>
+                
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div>
+                        <h5>Download Master</h5>
+                        <p class="mb-0">Downloaded 5+ versions of CleanCatClient</p>
+                    </div>
+                </div>
+                
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div>
+                        <h5>Collector</h5>
+                        <p class="mb-0">Purchased 3+ different products</p>
+                    </div>
+                </div>
+                
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div>
+                        <h5>Supporter</h5>
+                        <p class="mb-0">Made a donation to support development</p>
+                    </div>
+                </div>
+                
+                <div class="achievement achievement-locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h5>Veteran</h5>
+                        <p class="mb-0">Been a member for over 1 year</p>
+                    </div>
+                </div>
+                
+                <div class="achievement achievement-locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h5>Bug Hunter</h5>
+                        <p class="mb-0">Reported a confirmed bug</p>
+                    </div>
+                </div>
+                
+                <div class="achievement achievement-locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h5>Ultimate Supporter</h5>
+                        <p class="mb-0">Purchased the Ultimate Bundle</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-content">
+                <h3 class="mb-4">Account Settings</h3>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="minecraft-panel h-100">
+                            <h4>Profile Information</h4>
+                            <form id="profile-form" class="profile-form">
+                                <div class="form-group">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="minecraft-input form-control" value="{{ current_user.username }}" disabled>
+                                    <small class="text-muted">Username cannot be changed</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="minecraft-input form-control" value="{{ current_user.email }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="minecraft-input form-control" value="Player123">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Bio</label>
+                                    <textarea class="minecraft-input form-control" rows="3">Minecraft enthusiast and CleanCatClient user!</textarea>
+                                </div>
+                                <button type="submit" class="minecraft-btn primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="minecraft-panel h-100">
+                            <h4>Change Password</h4>
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" class="minecraft-input form-control" id="current-password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="minecraft-input form-control" id="new-password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" class="minecraft-input form-control" id="confirm-password">
+                                </div>
+                                <button type="submit" class="minecraft-btn primary">Change Password</button>
+                                <div id="password-message" style="display: none;"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="minecraft-panel mt-4">
+                    <h4 class="mb-4">Preferences</h4>
+                    
+                    <div class="settings-option">
+                        <div>
+                            <h5 class="mb-1">Email Notifications</h5>
+                            <p class="mb-0 text-muted">Receive emails about updates and offers</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div>
+                            <h5 class="mb-1">Auto-Download Updates</h5>
+                            <p class="mb-0 text-muted">Automatically download new versions</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div>
+                            <h5 class="mb-1">Public Profile</h5>
+                            <p class="mb-0 text-muted">Allow others to view your profile</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div>
+                            <h5 class="mb-1">Two-Factor Authentication</h5>
+                            <p class="mb-0 text-muted">Add an extra layer of security</p>
+                        </div>
+                        <a href="#" class="minecraft-btn secondary btn-sm">Enable</a>
+                    </div>
+                </div>
+                
+                <div class="minecraft-panel mt-4">
+                    <h4 class="mb-4 text-danger">Danger Zone</h4>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Delete Account</h5>
+                            <p class="mb-0 text-muted">This action cannot be undone</p>
+                        </div>
+                        <button class="minecraft-btn danger">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Support Tab -->
+            <div id="tab-support" class="tab-content">
+                <h3 class="mb-4">Support Tickets</h3>
+                
+                <div class="support-ticket">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5>Performance issue with v1.1.0</h5>
+                        <span class="ticket-status status-open">Open</span>
+                    </div>
+                    <p>I'm experiencing FPS drops when using shader packs with the latest version.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Ticket #T-2156 • Created on March 12, 2023</small>
+                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                </div>
+                
+                <div class="support-ticket">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5>Payment not processed</h5>
+                        <span class="ticket-status status-closed">Closed</span>
+                    </div>
+                    <p>My payment was charged but I didn't receive the Premium Package.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Ticket #T-1982 • Created on February 25, 2023</small>
+                        <a href="#" class="btn btn-sm btn-secondary">View Details</a>
+                    </div>
+                </div>
+                
+                <div class="minecraft-panel mt-4">
+                    <h4>Create New Support Ticket</h4>
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="minecraft-input form-control" placeholder="Brief description of your issue">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="minecraft-input form-control">
+                                <option>Technical Support</option>
+                                <option>Account Issues</option>
+                                <option>Billing & Payments</option>
+                                <option>Feature Request</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="minecraft-input form-control" rows="5" placeholder="Describe your issue in detail..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Priority</label>
+                            <select class="minecraft-input form-control">
+                                <option>Low</option>
+                                <option selected>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="minecraft-btn primary">Submit Ticket</button>
+                    </form>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p>Need immediate assistance? Join our <a href="#">Discord server</a> for live support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

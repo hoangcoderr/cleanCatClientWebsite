@@ -1,0 +1,365 @@
+/* Minecraft-specific styling elements */
+
+/* Minecraft Button */
+.minecraft-btn {
+    display: inline-block;
+    position: relative;
+    padding: 15px 30px;
+    background-color: #757575;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 2px 2px #000;
+    border: 3px solid #000;
+    border-bottom-width: 5px;
+    box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.5), 
+                inset -1px -1px 0px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.1s;
+    margin: 5px;
+}
+
+.minecraft-btn:hover {
+    background-color: #8B8B8B;
+    color: #FFF;
+}
+
+.minecraft-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 3px;
+}
+
+.minecraft-btn.primary {
+    background-color: #5D8544; /* Grass green */
+}
+
+.minecraft-btn.primary:hover {
+    background-color: #6EA54F;
+}
+
+.minecraft-btn.secondary {
+    background-color: #8B5A2B; /* Dirt brown */
+}
+
+.minecraft-btn.secondary:hover {
+    background-color: #A06B3A;
+}
+
+.minecraft-btn.danger {
+    background-color: #B22222; /* Redstone red */
+}
+
+.minecraft-btn.danger:hover {
+    background-color: #D52B2B;
+}
+
+.minecraft-btn.gold {
+    background-color: #DAA520; /* Gold */
+    color: #000;
+    text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.minecraft-btn.gold:hover {
+    background-color: #FFD700;
+}
+
+/* Minecraft Input */
+.minecraft-input {
+    background-color: #2E2E2E;
+    border: 3px solid #000;
+    color: #FFF;
+    padding: 15px;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    outline: none;
+    box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s;
+}
+
+.minecraft-input:focus {
+    background-color: #3E3E3E;
+    border-color: #5D8544;
+}
+
+/* Minecraft Panel */
+.minecraft-panel {
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 4px solid #000;
+    padding: 20px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.minecraft-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background-color: #5D8544;
+}
+
+/* Minecraft Progress Bar */
+.minecraft-progress {
+    height: 30px;
+    background-color: #2E2E2E;
+    border: 3px solid #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.minecraft-progress-bar {
+    height: 100%;
+    background-color: #5D8544;
+    transition: width 0.3s;
+    position: relative;
+}
+
+.minecraft-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.1) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+}
+
+/* Minecraft Table */
+.minecraft-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+}
+
+.minecraft-table th,
+.minecraft-table td {
+    padding: 15px;
+    border: 2px solid #000;
+}
+
+.minecraft-table th {
+    background-color: #8B5A2B;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    text-shadow: 1px 1px #000;
+}
+
+.minecraft-table td {
+    background-color: rgba(40, 40, 40, 0.9);
+    color: white;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+}
+
+.minecraft-table tr:hover td {
+    background-color: rgba(70, 70, 70, 0.9);
+}
+
+/* Minecraft Alert */
+.minecraft-alert {
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 3px solid #000;
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    position: relative;
+}
+
+.minecraft-alert.success {
+    border-color: #5D8544;
+}
+
+.minecraft-alert.success::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #5D8544;
+}
+
+.minecraft-alert.danger {
+    border-color: #B22222;
+}
+
+.minecraft-alert.danger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #B22222;
+}
+
+.minecraft-alert.warning {
+    border-color: #DAA520;
+}
+
+.minecraft-alert.warning::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #DAA520;
+}
+
+/* Pixel Border */
+.pixel-border {
+    position: relative;
+    border: 5px solid #000;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.pixel-border::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.1) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.1) 75%);
+    background-size: 2px 2px;
+    pointer-events: none;
+}
+
+/* Minecraft Checkbox */
+.minecraft-checkbox {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    user-select: none;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.minecraft-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.minecraft-checkbox .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #2E2E2E;
+    border: 3px solid #000;
+}
+
+.minecraft-checkbox:hover input ~ .checkmark {
+    background-color: #3E3E3E;
+}
+
+.minecraft-checkbox input:checked ~ .checkmark {
+    background-color: #5D8544;
+}
+
+.minecraft-checkbox .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.minecraft-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.minecraft-checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Minecraft Card */
+.minecraft-card {
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 4px solid #000;
+    margin-bottom: 20px;
+    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+    transform-style: preserve-3d;
+    transition: transform 0.3s;
+}
+
+.minecraft-card:hover {
+    transform: translateZ(5px) translateY(-5px);
+}
+
+.minecraft-card-header {
+    background-color: #8B5A2B;
+    color: white;
+    padding: 15px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    text-shadow: 1px 1px #000;
+    border-bottom: 4px solid #000;
+}
+
+.minecraft-card-body {
+    padding: 20px;
+    color: white;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+}
+
+/* Minecraft Title */
+.minecraft-title {
+    color: #FFF;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 2px 2px #000, 4px 4px 0px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.minecraft-title.gold {
+    color: #FFD700;
+}
+
+.minecraft-title.emerald {
+    color: #50C878;
+}
+
+.minecraft-title.diamond {
+    color: #B9F2FF;
+}
+
+/* Pixelated Images */
+.pixelated {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
