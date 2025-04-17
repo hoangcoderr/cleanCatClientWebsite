@@ -14,6 +14,8 @@ import Admin from './components/admin/Admin';
 import Download from './components/Download';
 import Donate from './components/Donate';
 import Profile from './components/Profile';
+import Checkout from './components/Checkout';
+import Updates from './components/Updates';
 
 const Home = () => {
   return (
@@ -41,6 +43,8 @@ const App = () => {
           <Route path="/download" element={<Download />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/updates" element={<Updates />} /> 
         </Routes>
       </Layout>
     </Router>
